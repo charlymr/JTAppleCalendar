@@ -13,7 +13,7 @@ protocol JTAppleCalendarLayoutProtocol: class {
     var cellCache: [Int:[UICollectionViewLayoutAttributes]] {get set}
     var headerCache: [UICollectionViewLayoutAttributes] {get set}
     
-    func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint) -> CGPoint
+    func targetContentOffsetForProposedContentOffset(_ proposedContentOffset: CGPoint) -> CGPoint
     func clearCache()
 }
 
@@ -24,5 +24,5 @@ protocol JTAppleCalendarDelegateProtocol: class {
     func numberOfMonthsInCalendar() -> Int
     func numberOfDaysPerSection() -> Int
     
-    func referenceSizeForHeaderInSection(section: Int) -> CGSize
+    func referenceSizeForHeaderInSection(_ section: Int) -> CGSize
 }

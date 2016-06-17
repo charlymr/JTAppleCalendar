@@ -31,7 +31,7 @@ public class JTAppleDayCell: UICollectionViewCell {
 
 		switch cellSource {
 		case let .fromXib(xibName):
-			let viewObject = NSBundle.mainBundle().loadNibNamed(xibName, owner: self, options: [:])
+			let viewObject = Bundle.main().loadNibNamed(xibName, owner: self, options: [:])
 			assert(viewObject.count > 0, "your nib file name \(xibName) could not be loaded)")
 
 			guard let view = viewObject[0] as? JTAppleDayCellView else {
@@ -42,7 +42,7 @@ public class JTAppleDayCell: UICollectionViewCell {
 			theView = view
 			break
 		case let .fromClassName(cellClassName):
-			guard let theCellClass = NSBundle.mainBundle().classNamed(cellClassName) as? JTAppleDayCellView.Type else {
+			guard let theCellClass = Bundle.main().classNamed(cellClassName) as? JTAppleDayCellView.Type else {
 				print("Error loading registered class: '\(cellClassName)'")
 				print("Make sure that: \n\n(1) It is a subclass of: 'JTAppleDayCellView' \n(2) You registered your class using the fully qualified name like so -->  'theNameOfYourProject.theNameOfYourClass'\n")
 				assert(false)
@@ -65,8 +65,8 @@ public class JTAppleDayCell: UICollectionViewCell {
 		updateCellView(theView)
 	}
 
-	func updateCellView(view: JTAppleDayCellView) {
-		let vFrame = CGRectInset(self.frame, internalCellInset.x, internalCellInset.y)
+	func updateCellView(_ view: JTAppleDayCellView) {
+		let vFrame = self.frame.insetBy(dx: internalCellInset.x, dy: internalCellInset.y)
 		view.frame = vFrame
 		view.center = CGPoint(x: self.bounds.size.width * 0.5, y: self.bounds.size.height * 0.5)
 		cellView = view

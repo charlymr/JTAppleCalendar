@@ -31,16 +31,16 @@ class Tests: XCTestCase {
     
     func testToMakeSureStringAppends() {
         var s1 = "Foo";
-        let expectation = expectationWithDescription("Handler called")
-        s1 = s1.stringByAppendingString("sd")
+        let expectation = self.expectation(withDescription: "Handler called")
+        s1 = s1 + "sd"
         expectation.fulfill()
-        waitForExpectationsWithTimeout(0.1, handler:nil)
+        waitForExpectations(withTimeout: 0.1, handler:nil)
     }
 
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock() {
+        self.measure() {
             // Put the code you want to measure the time of here.
         }
     }

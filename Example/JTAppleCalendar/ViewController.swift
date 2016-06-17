@@ -13,27 +13,27 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var calendarView: JTAppleCalendarView!
     @IBOutlet weak var monthLabel: UILabel!
-    let formatter = NSDateFormatter()
-    let testCalendar: NSCalendar! = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
+    let formatter = DateFormatter()
+    let testCalendar: Calendar! = Calendar(calendarIdentifier: Calendar.Identifier.gregorian)
     
-    @IBAction func changeToThreeRows(sender: UIButton) {
+    @IBAction func changeToThreeRows(_ sender: UIButton) {
         numberOfRows = 3
         calendarView.reloadData()
     }
     
-    @IBAction func changeToSixRows(sender: UIButton) {
+    @IBAction func changeToSixRows(_ sender: UIButton) {
         numberOfRows = 6
         calendarView.reloadData()
     }
     
     
-    @IBAction func reloadData(sender: UIButton) {
+    @IBAction func reloadData(_ sender: UIButton) {
         calendarView.reloadData()
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         formatter.dateFormat = "yyyy MM dd"
-        testCalendar.timeZone = NSTimeZone(abbreviation: "GMT")!
+        testCalendar.timeZone = TimeZone(abbreviation: "GMT")!
 
         
         calendarView.delegate = self
@@ -52,112 +52,112 @@ class ViewController: UIViewController {
         
         // The following default code can be removed since they are already the default.
         // They are only included here so that you can know what properties can be configured
-        calendarView.direction = .Horizontal                       // default is horizontal
+        calendarView.direction = .horizontal                       // default is horizontal
         calendarView.cellInset = CGPoint(x: 0, y: 0)               // default is (3,3)
         calendarView.allowsMultipleSelection = false               // default is false
         calendarView.bufferTop = 0                                 // default is 0. - still work in progress on this
         calendarView.bufferBottom = 0                              // default is 0. - still work in progress on this
-        calendarView.firstDayOfWeek = .Monday                      // default is Sunday
+        calendarView.firstDayOfWeek = .monday                      // default is Sunday
         calendarView.scrollEnabled = true                          // default is true
         calendarView.pagingEnabled = true                          // default is true
         calendarView.scrollResistance = 0.75                       // default is 0.75 - this is only applicable when paging is not enabled.
         calendarView.reloadData()
         
         // After reloading. Scroll to your selected date, and setup your calendar
-        calendarView.scrollToDate(NSDate(), triggerScrollToDateDelegate: false, animateScroll: false) {
+        calendarView.scrollToDate(Date(), triggerScrollToDateDelegate: false, animateScroll: false) {
             let currentDate = self.calendarView.currentCalendarDateSegment()
             self.setupViewsOfCalendar(currentDate.startDate, endDate: currentDate.endDate)
         }
     }
     
-    @IBAction func select10(sender: AnyObject?) {
+    @IBAction func select10(_ sender: AnyObject?) {
         calendarView.allowsMultipleSelection = true
-        var dates: [NSDate] = []
+        var dates: [Date] = []
         
-        dates.append(formatter.dateFromString("2016 02 03")!)
-        dates.append(formatter.dateFromString("2016 02 05")!)
-        dates.append(formatter.dateFromString("2016 02 07")!)
-        dates.append(formatter.dateFromString("2020 02 16")!) // --> This date will never be selected as it is outsde bounds
+        dates.append(formatter.date(from: "2016 02 03")!)
+        dates.append(formatter.date(from: "2016 02 05")!)
+        dates.append(formatter.date(from: "2016 02 07")!)
+        dates.append(formatter.date(from: "2020 02 16")!) // --> This date will never be selected as it is outsde bounds
                                                               // --> This is what happens when you select an invalid date
                                                               // --> It is simply not selected
         calendarView.selectDates(dates, triggerSelectionDelegate: false)
     }
     
-    @IBAction func select11(sender: AnyObject?) {
+    @IBAction func select11(_ sender: AnyObject?) {
         calendarView.allowsMultipleSelection = false
-        let date = formatter.dateFromString("2016 02 11")
+        let date = formatter.date(from: "2016 02 11")
         self.calendarView.selectDates([date!], triggerSelectionDelegate: false)
     }
     
-    @IBAction func scrollToDate(sender: AnyObject?) {
-        let date = formatter.dateFromString("2016 03 11")
+    @IBAction func scrollToDate(_ sender: AnyObject?) {
+        let date = formatter.date(from: "2016 03 11")
         calendarView.scrollToDate(date!)
     }
     
     @IBAction func printSelectedDates() {
         print("Selected dates --->")
         for date in calendarView.selectedDates {
-            print(formatter.stringFromDate(date))
+            print(formatter.string(from: date))
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    func setupViewsOfCalendar(startDate: NSDate, endDate: NSDate) {
-        let month = testCalendar.component(NSCalendarUnit.Month, fromDate: startDate)
-        let monthName = NSDateFormatter().monthSymbols[(month-1) % 12] // 0 indexed array
-        let year = NSCalendar.currentCalendar().component(NSCalendarUnit.Year, fromDate: startDate)
+    func setupViewsOfCalendar(_ startDate: Date, endDate: Date) {
+        let month = testCalendar.component(Calendar.Unit.month, from: startDate)
+        let monthName = DateFormatter().monthSymbols[(month-1) % 12] // 0 indexed array
+        let year = Calendar.current().component(Calendar.Unit.year, from: startDate)
         monthLabel.text = monthName + " " + String(year)
     }
 }
 
 // MARK : JTAppleCalendarDelegate
 extension ViewController: JTAppleCalendarViewDataSource, JTAppleCalendarViewDelegate {
-    func configureCalendar(calendar: JTAppleCalendarView) -> (startDate: NSDate, endDate: NSDate, numberOfRows: Int, calendar: NSCalendar) {
+    func configureCalendar(_ calendar: JTAppleCalendarView) -> (startDate: Date, endDate: Date, numberOfRows: Int, calendar: Calendar) {
         
-        let firstDate = formatter.dateFromString("2016 01 01")
-        let secondDate = NSDate()
-        let aCalendar = NSCalendar.currentCalendar() // Properly configure your calendar to your time zone here
+        let firstDate = formatter.date(from: "2016 01 01")
+        let secondDate = Date()
+        let aCalendar = Calendar.current() // Properly configure your calendar to your time zone here
         return (startDate: firstDate!, endDate: secondDate, numberOfRows: numberOfRows, calendar: aCalendar)
     }
 
-    func calendar(calendar: JTAppleCalendarView, isAboutToDisplayCell cell: JTAppleDayCellView, date: NSDate, cellState: CellState) {
+    func calendar(_ calendar: JTAppleCalendarView, isAboutToDisplayCell cell: JTAppleDayCellView, date: Date, cellState: CellState) {
         (cell as? CellView)?.setupCellBeforeDisplay(cellState, date: date)
     }
 
-    func calendar(calendar: JTAppleCalendarView, didDeselectDate date: NSDate, cell: JTAppleDayCellView?, cellState: CellState) {
+    func calendar(_ calendar: JTAppleCalendarView, didDeselectDate date: Date, cell: JTAppleDayCellView?, cellState: CellState) {
         (cell as? CellView)?.cellSelectionChanged(cellState)
     }
     
-    func calendar(calendar: JTAppleCalendarView, didSelectDate date: NSDate, cell: JTAppleDayCellView?, cellState: CellState) {
+    func calendar(_ calendar: JTAppleCalendarView, didSelectDate date: Date, cell: JTAppleDayCellView?, cellState: CellState) {
         (cell as? CellView)?.cellSelectionChanged(cellState)
         printSelectedDates()
     }
     
     
-    func calendar(calendar: JTAppleCalendarView, didScrollToDateSegmentStartingWithdate startDate: NSDate, endingWithDate endDate: NSDate) {
+    func calendar(_ calendar: JTAppleCalendarView, didScrollToDateSegmentStartingWithdate startDate: Date, endingWithDate endDate: Date) {
         setupViewsOfCalendar(startDate, endDate: endDate)
     }
     
-    func calendar(calendar: JTAppleCalendarView, sectionHeaderIdentifierForDate date: (startDate: NSDate, endDate: NSDate)) -> String? {
-        let comp = testCalendar.component(.Month, fromDate: date.startDate)
+    func calendar(_ calendar: JTAppleCalendarView, sectionHeaderIdentifierForDate date: (startDate: Date, endDate: Date)) -> String? {
+        let comp = testCalendar.component(.month, from: date.startDate)
         if comp % 2 > 0{
             return "WhiteSectionHeaderView"
         }
         return "PinkSectionHeaderView"
     }
    
-    func calendar(calendar: JTAppleCalendarView, sectionHeaderSizeForDate date: (startDate: NSDate, endDate: NSDate)) -> CGSize {
-        if testCalendar.component(.Month, fromDate: date.startDate) % 2 == 1 {
+    func calendar(_ calendar: JTAppleCalendarView, sectionHeaderSizeForDate date: (startDate: Date, endDate: Date)) -> CGSize {
+        if testCalendar.component(.month, from: date.startDate) % 2 == 1 {
             return CGSize(width: 200, height: 50)
         } else {
             return CGSize(width: 200, height: 100) // Yes you can have different size headers
         }
     }
     
-    func calendar(calendar: JTAppleCalendarView, isAboutToDisplaySectionHeader header: JTAppleHeaderView, date: (startDate: NSDate, endDate: NSDate), identifier: String) {
+    func calendar(_ calendar: JTAppleCalendarView, isAboutToDisplaySectionHeader header: JTAppleHeaderView, date: (startDate: Date, endDate: Date), identifier: String) {
         switch identifier {
         case "WhiteSectionHeaderView":
             let headerCell = (header as? WhiteSectionHeaderView)
@@ -170,11 +170,7 @@ extension ViewController: JTAppleCalendarViewDataSource, JTAppleCalendarViewDele
 }
 
 
-func delayRunOnMainThread(delay:Double, closure:()->()) {
-    dispatch_after(
-        dispatch_time(
-            DISPATCH_TIME_NOW,
-            Int64(delay * Double(NSEC_PER_SEC))
-        ),
-        dispatch_get_main_queue(), closure)
+func delayRunOnMainThread(_ delay:Double, closure:()->()) {
+    DispatchQueue.main.after(
+        when: DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: closure)
 }
