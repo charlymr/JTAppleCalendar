@@ -8,7 +8,7 @@ Inspiration for this control was made possible by Michael @ Karmadust. Want to k
 
 [![CI Status](http://img.shields.io/travis/patchthecode/JTAppleCalendar.svg?style=flat)](https://travis-ci.org/patchthecode/JTAppleCalendar) [![Version](https://img.shields.io/cocoapods/v/JTAppleCalendar.svg?style=flat)](http://cocoapods.org/pods/JTAppleCalendar) [![License](https://img.shields.io/cocoapods/l/JTAppleCalendar.svg?style=flat)](http://cocoapods.org/pods/JTAppleCalendar) [![Platform](https://img.shields.io/cocoapods/p/JTAppleCalendar.svg?style=flat)](http://cocoapods.org/pods/JTAppleCalendar)
 
-### **About Screenshots**
+### **Screenshots**
 The look of this calendar is up to the developer. Check out what people have developed with this library and also post your own images [at this link](https://github.com/patchthecode/JTAppleCalendar/issues/2). A sample iOS application is also included in this project's [Github Repository](https://github.com/patchthecode/JTAppleCalendar) to give you an idea of what you can do.
 
 * Downloaded and liked this calendar's ease of use?
@@ -28,47 +28,6 @@ The look of this calendar is up to the developer. Check out what people have dev
 - [x] Ability to scroll to any month by simply using the date
 - [x] Ability to design your calendar [however you want.](https://github.com/patchthecode/JTAppleCalendar/issues/2) You want it, you build it
 - [x] [Complete Documentation](http://cocoadocs.org/docsets/JTAppleCalendar)
-
-
-### **Requirements**
----
-
-* iOS 8.0+ 
-* Xcode 7.2+
-
-
-
-### **Communication on Github**
----
-* Found a bug? [open an issue](https://github.com/patchthecode/JTAppleCalendar/issues)
-* Got a cool feature request? [open an issue](https://github.com/patchthecode/JTAppleCalendar/issues)
-* Need a question answered? [open an issue](https://github.com/patchthecode/JTAppleCalendar/issues) 
-
-
-### **Installation using CocoaPods**
-
-CocoaPods is a dependency manager for Cocoa projects. Cocoapods can be installed with the following command:
-
-$ gem install cocoapods
-
-
-
-> CocoaPods 0.39.0+ is required to build JTAppleCalendar
-
-To integrate JTAppleCalendar into your Xcode project using CocoaPods, specify it in your Podfile:
-
-```ruby
-platform :ios, '8.0'
-use_frameworks!
-
-pod 'JTAppleCalendar'
-```
-
-Then, run the following command at your project location:
-
-```bash
-$ pod install
-```
 
 ### **The Problem**
 ---
@@ -135,6 +94,46 @@ Do you have any other questions?. If you are trying to bend heaven and earth to 
 Did you remember to leave a like? I would really appreciate it if you did. 
 
 Other functions/properties are coming. This is a very active project.
+
+### **Requirements**
+---
+
+* iOS 8.0+ 
+* Xcode 7.2+
+
+
+
+### **Communication on Github**
+---
+* Found a bug? [open an issue](https://github.com/patchthecode/JTAppleCalendar/issues)
+* Got a cool feature request? [open an issue](https://github.com/patchthecode/JTAppleCalendar/issues)
+* Need a question answered? [open an issue](https://github.com/patchthecode/JTAppleCalendar/issues) 
+
+
+### **Installation using CocoaPods**
+
+CocoaPods is a dependency manager for Cocoa projects. Cocoapods can be installed with the following command:
+
+$ gem install cocoapods
+
+
+
+> CocoaPods 0.39.0+ is required to build JTAppleCalendar
+
+To integrate JTAppleCalendar into your Xcode project using CocoaPods, specify it in your Podfile:
+
+```ruby
+platform :ios, '8.0'
+use_frameworks!
+
+pod 'JTAppleCalendar'
+```
+
+Then, run the following command at your project location:
+
+```bash
+$ pod install
+```
 
 
 ## Author
