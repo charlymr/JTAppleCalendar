@@ -187,20 +187,6 @@ public class JTAppleCalendarView: UIView {
     // Keeps track of item size for a section. This is an optimization
     var scrollInProgress = false
     private var layoutNeedsUpdating = false
-    
-    /// Number of rows to be displayed per month. Allowed values are 1, 2, 3 & 6.
-    /// After changing this value, you should reload your calendarView to show your change
-    public var numberOfRowsPerMonth: Int {
-        set {
-            if newValue != cachedConfiguration.numberOfRows {
-                cachedConfiguration.numberOfRows = newValue
-                if newValue == 4 || newValue == 5 || newValue > 6 || newValue < 0 { self.numberOfRowsPerMonth = 6 }
-                layoutNeedsUpdating = true
-            }
-        }
-        
-        get { return cachedConfiguration.numberOfRows }
-    }
     /// The object that acts as the data source of the calendar view.
     public var dataSource : JTAppleCalendarViewDataSource? {
         didSet {
@@ -213,7 +199,7 @@ public class JTAppleCalendarView: UIView {
 
     var dateComponents = DateComponents()
     var delayedExecutionClosure: [(()->Void)] = []
-    var lastOrientation: UIDeviceOrientation?
+    var lastOrientation: UIInterfaceOrientation?
     
     var currentSectionPage: Int {
         let cvbounds = self.calendarView.bounds
@@ -288,7 +274,7 @@ public class JTAppleCalendarView: UIView {
     
     var numberOfMonths: Int = 0
     var numberOfSectionsPerMonth: Int = 0
-    var numberOfItemsPerSection: Int {return MAX_NUMBER_OF_DAYS_IN_WEEK * numberOfRowsPerMonth}
+    var numberOfItemsPerSection: Int {return MAX_NUMBER_OF_DAYS_IN_WEEK * cachedConfiguration.numberOfRows}
     
     /// Cell inset padding for the x and y axis of every date-cell on the calendar view.
     public var cellInset: CGPoint {
@@ -337,7 +323,7 @@ public class JTAppleCalendarView: UIView {
         
         layout.itemSize = CGSize(
             width: self.calendarView.bounds.size.width / CGFloat(MAX_NUMBER_OF_DAYS_IN_WEEK),
-            height: (self.calendarView.bounds.size.height - layout.headerReferenceSize.height) / CGFloat(numberOfRowsPerMonth)
+            height: (self.calendarView.bounds.size.height - layout.headerReferenceSize.height) / CGFloat(cachedConfiguration.numberOfRows)
         )
 
         self.calendarView.collectionViewLayout = layout as! UICollectionViewLayout
@@ -347,9 +333,9 @@ public class JTAppleCalendarView: UIView {
     override public var frame: CGRect {
         didSet {
             calendarView.frame = CGRect(x:0.0, y:/*bufferTop*/0.0, width: self.frame.size.width, height:self.frame.size.height/* - bufferBottom*/)
-            let orientation = UIDevice.current().orientation
+            let orientation = UIApplication.shared().statusBarOrientation
             if orientation == .unknown { return }
-            if lastOrientation != orientation {
+           if lastOrientation != orientation {
                 lastOrientation = orientation
                 calendarView.collectionViewLayout.invalidateLayout()
                 let layout = calendarView.collectionViewLayout as! JTAppleCalendarLayoutProtocol
@@ -699,7 +685,7 @@ public class JTAppleCalendarView: UIView {
                 numberOfMonths = differenceComponents.month! + 1 // if we are for example on the same month and the difference is 0 we still need 1 to display it
                 
                 // Number of sections in each month
-                numberOfSectionsPerMonth = Int(ceil(Float(MAX_NUMBER_OF_ROWS_PER_MONTH)  / Float(numberOfRowsPerMonth)))
+                numberOfSectionsPerMonth = Int(ceil(Float(MAX_NUMBER_OF_ROWS_PER_MONTH)  / Float(cachedConfiguration.numberOfRows)))
 
                 // Section represents # of months. section is used as an offset to determine which month to calculate
                 for numberOfMonthsIndex in 0 ... numberOfMonths - 1 {
@@ -714,7 +700,7 @@ public class JTAppleCalendarView: UIView {
                         
                         // We have number of days in month, now lets see how these days will be allotted into the number of sections in the month
                         // We will add the first segment manually to handle the fdIndex inset
-                        let aFullSection = (numberOfRowsPerMonth * MAX_NUMBER_OF_DAYS_IN_WEEK)
+                        let aFullSection = (cachedConfiguration.numberOfRows * MAX_NUMBER_OF_DAYS_IN_WEEK)
                         var numberOfDaysInFirstSection = aFullSection - firstWeekdayOfMonthIndex
                         
                         // If the number of days in first section is greater that the days of the month, then use days of month instead
@@ -902,7 +888,7 @@ extension JTAppleCalendarView {
         let currentMonthInfo = monthInfo[itemSection]
         let fdIndex = currentMonthInfo[FIRST_DAY_INDEX]
         let offSet = currentMonthInfo[OFFSET_CALC]
-        let cellDate = (numberOfRowsPerMonth * MAX_NUMBER_OF_DAYS_IN_WEEK * (itemSection % numberOfSectionsPerMonth)) + itemIndex - fdIndex - offSet + 1
+        let cellDate = (cachedConfiguration.numberOfRows * MAX_NUMBER_OF_DAYS_IN_WEEK * (itemSection % numberOfSectionsPerMonth)) + itemIndex - fdIndex - offSet + 1
         
         dateComponents.month = monthIndexWeAreOn
         dateComponents.weekday = cellDate - 1
@@ -914,7 +900,7 @@ extension JTAppleCalendarView {
 
 
 extension JTAppleCalendarView: JTAppleCalendarDelegateProtocol {
-    func numberOfRows() -> Int {return numberOfRowsPerMonth}
+    func numberOfRows() -> Int {return cachedConfiguration.numberOfRows}
     func numberOfColumns() -> Int { return MAX_NUMBER_OF_DAYS_IN_WEEK }
     func numberOfsectionsPermonth() -> Int { return numberOfSectionsPerMonth }
     func numberOfMonthsInCalendar() -> Int { return numberOfMonths }
