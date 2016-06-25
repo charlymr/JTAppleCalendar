@@ -188,7 +188,7 @@ public class JTAppleCalendarView: UIView {
     var scrollInProgress = false
     private var layoutNeedsUpdating = false
     
-    @available(*, deprecated, message="This has been deprecated in 4.0.3. Please consider removing it from your code")
+    @available(*, deprecated, message:"This has been deprecated in 4.0.3. Please consider removing it from your code")
     public var numberOfRowsPerMonth: Int = 0
     
     /// The object that acts as the data source of the calendar view.

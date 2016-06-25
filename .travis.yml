@@ -1,4 +1,5 @@
 language: swift
+osx_image: xcode8
 xcode_workspace: Example/JTAppleCalendar.xcworkspace
 xcode_scheme: JTAppleCalendar-Example
 xcode_sdk: iphonesimulator
