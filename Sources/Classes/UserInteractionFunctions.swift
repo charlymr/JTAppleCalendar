@@ -115,7 +115,7 @@ extension JTAppleCalendarView {
     public func selectDates(_ dates: [Date], triggerSelectionDelegate: Bool = true) {
         var allIndexPathsToReload: [IndexPath] = []
         
-        delayRunOnGlobalThread(0.0, qos: DispatchQueueAttributes.qosUserInitiated) {
+        delayRunOnGlobalThread(delay: 0.0, qos: QOS_CLASS_USER_INITIATED) {
             for date in dates {
                 let components = self.calendar.components([.year, .month, .day],  from: date)
                 let firstDayOfDate = self.calendar.date(from: components)!
@@ -136,13 +136,13 @@ extension JTAppleCalendarView {
                 
                 
                 let selectTheDate = {
-                    delayRunOnMainThread(0.0) {
+                    delayRunOnMainThread(delay: 0.0) {
                         self.calendarView.selectItem(at: sectionIndexPath, animated: false, scrollPosition: UICollectionViewScrollPosition())
                     }
                     
                     // If triggereing is enabled, then let their delegate handle the reloading of view, else we will reload the data
                     if triggerSelectionDelegate {
-                        delayRunOnMainThread(0.0) {
+                        delayRunOnMainThread(delay: 0.0) {
                             self.collectionView(self.calendarView, didSelectItemAt: sectionIndexPath)
                         }
                     } else { // Although we do not want the delegate triggered, we still want counterpart cells to be selected
@@ -161,7 +161,7 @@ extension JTAppleCalendarView {
                 
                 let deSelectTheDate = { (indexPath: IndexPath) -> Void in
                     allIndexPathsToReload.append(indexPath)
-                    delayRunOnMainThread(0.0) {
+                    delayRunOnMainThread(delay: 0.0) {
                         self.calendarView.deselectItem(at: indexPath, animated: false)
                     }
                     if
@@ -173,7 +173,7 @@ extension JTAppleCalendarView {
                     }
                     // If delegate triggering is enabled, let the delegate function handle the cell
                     if triggerSelectionDelegate {
-                        delayRunOnMainThread(0.0) {
+                        delayRunOnMainThread(delay: 0.0) {
                             self.collectionView(self.calendarView, didDeselectItemAt: indexPath)
                         }
                     } else { // Although we do not want the delegate triggered, we still want counterpart cells to be deselected
@@ -210,7 +210,7 @@ extension JTAppleCalendarView {
             
             // If triggering was false, although the selectDelegates weren't called, we do want the cell refreshed. Reload to call itemAtIndexPath
             if triggerSelectionDelegate == false {
-                delayRunOnMainThread(0.0) {
+                delayRunOnMainThread(delay: 0.0) {
                     self.reloadIndexPathsIfVisible(allIndexPathsToReload)
                 }
             }
@@ -256,7 +256,7 @@ extension JTAppleCalendarView {
         let firstDayOfDate = calendar.date(from: components)!
         
         scrollInProgress = true
-        delayRunOnMainThread(0.0, closure: {
+        delayRunOnMainThread(delay: 0.0, closure: {
             // This part should be inside the mainRunLoop
             if !(firstDayOfDate >= self.startOfMonthCache && firstDayOfDate <= self.endOfMonthCache) {
                 self.scrollInProgress = false
@@ -287,10 +287,7 @@ extension JTAppleCalendarView {
                 }
                 
                 let scrollToIndexPath = {(iPath: IndexPath, withAnimation: Bool)-> Void in
-                    if let validCompletionHandler = completionHandler {
-                        self.delayedExecutionClosure.append(validCompletionHandler)
-                    }
-                     
+                    if let validCompletionHandler = completionHandler { self.delayedExecutionClosure.append(validCompletionHandler) }
                     // regular movement
                     self.calendarView.scrollToItem(at: iPath, at: position, animated: animateScroll)
                     
@@ -307,8 +304,10 @@ extension JTAppleCalendarView {
                 if self.pagingEnabled {
                     if headerViewXibs.count > 0 {
                         // If both paging and header is on, then scroll to the actual date
-                        if self.direction == .vertical {
-                            self.scrollToHeaderInSection((sectionIndexPath as NSIndexPath).section, triggerScrollToDateDelegate: triggerScrollToDateDelegate, withAnimation: animateScroll)
+                        // If direction is vertical and user has a custom size that is at least the size of the collectionview.
+                        // If this check is not done, it will scroll to header, and have white space at bottom because view is smaller due to small custom user itemSize
+                        if self.direction == .vertical && (self.calendarView.collectionViewLayout as! JTAppleCalendarLayout).sizeOfSection(section: sectionIndexPath.section) >= self.calendarView.frame.height {
+                            self.scrollToHeaderInSection(sectionIndexPath.section, triggerScrollToDateDelegate: triggerScrollToDateDelegate, withAnimation: animateScroll, completionHandler: completionHandler)
                             return
                         } else {
                             scrollToIndexPath(IndexPath(item: 0, section: (sectionIndexPath as NSIndexPath).section), animateScroll)
@@ -323,7 +322,7 @@ extension JTAppleCalendarView {
                 }
                 
                 // Jt101 put this into a function to reduce code between this and the scroll to header function
-                delayRunOnMainThread(0.0, closure: {
+                delayRunOnMainThread(delay: 0.0, closure: {
                     if  !animateScroll  {
                         self.scrollViewDidEndScrollingAnimation(self.calendarView)
                         self.scrollInProgress = false

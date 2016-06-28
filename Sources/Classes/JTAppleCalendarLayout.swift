@@ -23,12 +23,15 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     
     var cellCache: [Int:[UICollectionViewLayoutAttributes]] = [:]
     var headerCache: [UICollectionViewLayoutAttributes] = []
-    
+    var sectionSize: [CGFloat] = []
     
     weak var delegate: JTAppleCalendarDelegateProtocol?
     
     var currentHeader: (section: Int, size: CGSize)? // Tracks the current header size
     var currentCell: (section: Int, itemSize: CGSize)? // Tracks the current cell size
+    
+    var contentHeight: CGFloat = 0 // Content height of calendarView
+    var contentWidth: CGFloat = 0 // Content wifth of calendarView
     
     init(withDelegate delegate: JTAppleCalendarDelegateProtocol) {
         super.init()
@@ -37,92 +40,81 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     
     /// Tells the layout object to update the current layout.
     public override func prepare() {
-        if !cellCache.isEmpty {
-            return
-        }
+        if !cellCache.isEmpty { return }
         
         maxSections = numberOfMonthsInCalendar * numberOfSectionsPerMonth
         daysPerSection = numberOfDaysPerSection
         
-        // // Generate and cache the headers
+        // Generate and cache the headers
         for section in 0..<maxSections {
-            // generate header views
-            let sectionIndexPath = IndexPath(item: 0, section: section)
-            if let aHeaderAttr = layoutAttributesForSupplementaryView(ofKind: UICollectionElementKindSectionHeader, at: sectionIndexPath) {
-                headerCache.append(aHeaderAttr)
+            
+            if headerViewXibs.count > 0 {
+                // generate header views
+                let sectionIndexPath = IndexPath(item: 0, section: section)
+                if let aHeaderAttr = layoutAttributesForSupplementaryView(ofKind: UICollectionElementKindSectionHeader, at: sectionIndexPath) {
+                    headerCache.append(aHeaderAttr)
+                    if scrollDirection == .vertical { contentHeight += aHeaderAttr.frame.height } else { contentWidth += aHeaderAttr.frame.width }
+                }
             }
             
             // Generate and cache the cells
             for item in 0..<daysPerSection {
-                let indexPath = IndexPath(item: item, section: section)
-                if let attribute = layoutAttributesForItem(at: indexPath) {
+                let indexPath = NSIndexPath(item: item, section: section)
+                if let attribute = layoutAttributesForItem(at: indexPath as IndexPath) {
                     if cellCache[section] == nil {
                         cellCache[section] = []
+                        if scrollDirection == .vertical { contentHeight += (attribute.frame.height * CGFloat(numberOfRows)) }
                     }
                     cellCache[section]!.append(attribute)
-                } else {
-                    print("error.")
                 }
             }
+            
+            // Save the content size for each section
+            sectionSize.append(scrollDirection == .horizontal ? contentWidth : contentHeight)
+            
         }
+        
+        if scrollDirection == .horizontal { contentHeight = self.collectionView!.bounds.size.height } else { contentWidth = self.collectionView!.bounds.size.width }
     }
     
     /// Returns the width and height of the collection view’s contents. The width and height of the collection view’s contents.
     public override func collectionViewContentSize() -> CGSize {
-        var size = super.collectionViewContentSize()
-        
-        if scrollDirection == .horizontal {
-            size.width = self.collectionView!.bounds.size.width * CGFloat(numberOfMonthsInCalendar * numberOfSectionsPerMonth)
-        } else {
-            size.height = self.collectionView!.bounds.size.height * CGFloat(numberOfMonthsInCalendar * numberOfSectionsPerMonth)
-            size.width = self.collectionView!.bounds.size.width
-        }
-        return size
+        return CGSize(width: contentWidth, height: contentHeight)
     }
     
     /// Returns the layout attributes for all of the cells and views in the specified rectangle.
     override public func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        var startSectionIndex = scrollDirection == .horizontal ? Int(floor(rect.origin.x / collectionView!.frame.width)): Int(floor(rect.origin.y / collectionView!.frame.height))
-        if startSectionIndex < 0 { startSectionIndex = 0 }
-        if startSectionIndex > cellCache.count { startSectionIndex = cellCache.count }
-        
-//        let requestedSections = scrollDirection == .Horizontal ? Int(ceil(rect.width / collectionView!.frame.width)) : Int(ceil(rect.height / collectionView!.frame.height))
-//        let endsection = startSectionIndex + requestedSections
+        let startSectionIndex = internalCachedCellSectionFromRectOffset(offset: rect.origin)
         
         // keep looping until there were no interception rects
         var attributes: [UICollectionViewLayoutAttributes] = []
-        let maxMissCount = scrollDirection == .horizontal ? 6 : 7
+        let maxMissCount = scrollDirection == .horizontal ? MAX_NUMBER_OF_ROWS_PER_MONTH : MAX_NUMBER_OF_DAYS_IN_WEEK
+        var beganIntercepting = false
+        var missCount = 0
         for sectionIndex in startSectionIndex..<cellCache.count {
-//            print("checking section: \(sectionIndex)")
             if let validSection = cellCache[sectionIndex] where validSection.count > 0 {
-                
                 // Add header view attributes
+                
                 var interceptCount: Int  = 0
                 if headerViewXibs.count > 0 {
-                    interceptCount += 1
                     if headerCache[sectionIndex].frame.intersects(rect) {
                         attributes.append(headerCache[sectionIndex])
                     }
                 }
                 
-                var missCount = 0
-                var beganIntercepting = false
                 for val in validSection {
                     if val.frame.intersects(rect) {
                         missCount = 0
                         beganIntercepting = true
                         attributes.append(val)
-//                        print("s: \(sectionIndex) i: \(index)")
                     } else {
                         missCount += 1
                         if missCount > maxMissCount && beganIntercepting { // If there are at least 8 misses in a row since intercepting began, then this section has no more interceptions. So break
-//                            print("There are no more interceptions for section: \(sectionIndex)")
                             break
                         }
                     }
                 }
-                if missCount > maxMissCount && beganIntercepting {
-//                    print("breaking also from outter loop. Rect was: \(rect)")
+                if missCount > maxMissCount && beganIntercepting { // Also break from outter loop
                     break
                 }
             }
@@ -135,11 +127,11 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         let attr = UICollectionViewLayoutAttributes(forCellWith: indexPath)
         
         // If this index is already cached, then return it else, apply a new layout attribut to it
-        if let alreadyCachedCellAttrib = cellCache[indexPath.section] where indexPath.item < alreadyCachedCellAttrib.count, let item = indexPath.item {
-            return alreadyCachedCellAttrib[item]
+        if let alreadyCachedCellAttrib = cellCache[indexPath.section] where indexPath.item < alreadyCachedCellAttrib.count {
+            return alreadyCachedCellAttrib[indexPath.item!]
         }
         
-        applyLayoutAttributes(attr)
+        applyLayoutAttributes(attributes: attr)
         return attr
     }
     
@@ -148,20 +140,89 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         let attributes = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: elementKind, with: indexPath)
         
         // We cache the header here so we dont call the delegate so much
-        let headerSize = cachedHeaderSizeForSection((indexPath as NSIndexPath).section)
-        let modifiedSize = CGSize(width: collectionView!.frame.size.width, height: headerSize.height)
-        let stride = scrollDirection == .horizontal ? collectionView!.frame.size.width : collectionView!.frame.size.height
-        let offset = CGFloat(attributes.indexPath.section) * stride
+        let headerSize = cachedHeaderSizeForSection(section: indexPath.section)
+        var strideOffset: CGFloat = 0
+        if indexPath.section > 0 {
+            
+            var headerSizeOfPreviousSection: CGFloat
+            var itemSectionSizeOfPreviousSection: CGFloat
+            
+            if scrollDirection == .vertical {
+                headerSizeOfPreviousSection = headerCache[attributes.indexPath.section - 1].frame.height
+                itemSectionSizeOfPreviousSection = cellCache[attributes.indexPath.section - 1]![0].frame.height * CGFloat(numberOfRows)
+                strideOffset = itemSectionSizeOfPreviousSection + headerSizeOfPreviousSection + headerCache[attributes.indexPath.section - 1].frame.origin.y
+            } else {
+                headerSizeOfPreviousSection = headerCache[attributes.indexPath.section - 1].frame.width
+                itemSectionSizeOfPreviousSection = cellCache[attributes.indexPath.section - 1]![0].frame.width * CGFloat(numberOfColumns)
+                strideOffset = itemSectionSizeOfPreviousSection * CGFloat(indexPath.section)
+            }
+        }
         
-        attributes.frame = scrollDirection == .horizontal ? CGRect(x: offset, y: 0, width: modifiedSize.width, height: modifiedSize.height) : CGRect(x: 0, y: offset, width: modifiedSize.width, height: modifiedSize.height)
-        if attributes.frame == CGRect.zero { return nil }
+        // Use the calculaed header size and force thw width of the header to take up 7 columns
+        let modifiedSize = CGSize(width: itemSize.width * CGFloat(numberOfColumns), height: headerSize.height)
+        
+        
+        
+        attributes.frame = scrollDirection == .horizontal ?
+            CGRect(x: strideOffset, y: 0, width: modifiedSize.width, height: modifiedSize.height) :
+            CGRect(x: 0, y: strideOffset, width: modifiedSize.width, height: modifiedSize.height)
+        if attributes.frame == CGRect() { return nil }
         
         return attributes
     }
     
-    func cachedHeaderSizeForSection(_ section: Int) -> CGSize {
+    func applyLayoutAttributes(attributes : UICollectionViewLayoutAttributes) {
+        if attributes.representedElementKind != nil { return }
+        guard let collectionView = self.collectionView else { return }
+        
+        // Calculate the item size
+        if let itemSize = delegate!.itemSize {
+            if scrollDirection == .vertical {
+                self.itemSize.height = itemSize
+            } else {
+                self.itemSize.width = itemSize
+                self.itemSize.height = sizeForitemAtIndexPath(indexPath: attributes.indexPath).height
+            }
+        } else { itemSize = sizeForitemAtIndexPath(indexPath: attributes.indexPath) } // jt101 the width is already set form the outside. may change this to all inside here.
+        
+        
+        // Calculate the item stride
+        var stride: CGFloat = 0
+        
+        if headerViewXibs.count > 0 { // If we have headers the cell must start under the header
+            let headerSize = headerCache[attributes.indexPath.section].frame.height
+            let headerOrigin = headerCache[attributes.indexPath.section].frame.origin.y
+            if scrollDirection == .vertical { // Headers will affect the stride of Vertical NOT Horizontal
+                stride += headerSize + headerOrigin
+            } else {
+                stride += CGFloat(attributes.indexPath.section) * itemSize.width * CGFloat(numberOfColumns)
+            }
+        } else { // If there are no headers then all the cells will have the same height, therefore the strides will have the same height
+            stride = scrollDirection == .horizontal ? CGFloat(attributes.indexPath.section) * itemSize.width * CGFloat(numberOfColumns): CGFloat(attributes.indexPath.section) * itemSize.height * CGFloat(numberOfRows)
+        }
+        
+        var xCellOffset : CGFloat = CGFloat(attributes.indexPath.item! % MAX_NUMBER_OF_DAYS_IN_WEEK) * self.itemSize.width
+        var yCellOffset :CGFloat = CGFloat(attributes.indexPath.item! / MAX_NUMBER_OF_DAYS_IN_WEEK) * self.itemSize.height
+        
+        if scrollDirection == .horizontal {
+            xCellOffset += stride
+            
+            // Headers will affect the start origin of Horizontal layout. Vertical layout is already accounted for in the stride because
+            // you are scrolling in the same direction as the headers height. Thus, headers affect vertical stride, while it affects Horizontal offsets
+            if headerViewXibs.count > 0 {
+                yCellOffset += headerCache[attributes.indexPath.section].frame.height // Adjust the y ofset
+            }
+        } else {
+            yCellOffset += stride
+        }
+        
+        attributes.frame = CGRect(x: xCellOffset, y: yCellOffset, width: self.itemSize.width, height: self.itemSize.height)
+        
+    }
+    
+    func cachedHeaderSizeForSection(section: Int) -> CGSize {
         // We cache the header here so we dont call the delegate so much
-        let headerSize: CGSize
+        var headerSize = CGSize()
         if let cachedHeader  = currentHeader where cachedHeader.section == section {
             headerSize = cachedHeader.size
         } else {
@@ -171,43 +232,68 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         return headerSize
     }
     
-    func applyLayoutAttributes(_ attributes : UICollectionViewLayoutAttributes) {
-        if attributes.representedElementKind != nil { return }
+    func sizeForitemAtIndexPath(indexPath: NSIndexPath) -> CGSize {
+        // Return the size if the cell size is already cached
+        if let cachedCell  = currentCell where cachedCell.section == indexPath.section { return cachedCell.itemSize }
         
-        if let collectionView = self.collectionView {
-            
-            let sectionStride: CGFloat = scrollDirection == .horizontal ? collectionView.frame.size.width : collectionView.frame.size.height
-            let sectionOffset = CGFloat(attributes.indexPath.section) * sectionStride
-            var xCellOffset : CGFloat = CGFloat(attributes.indexPath.item! % 7) * self.itemSize.width
-            var yCellOffset :CGFloat = CGFloat(attributes.indexPath.item! / 7) * self.itemSize.height
-            
-            if headerViewXibs.count > 0 {
-                let sizeOfItem = sizeForitemAtIndexPath(attributes.indexPath)
-                itemSize.height = sizeOfItem.height
-            }
-            
-            if scrollDirection == .horizontal {
-                xCellOffset += sectionOffset
-            } else {
-                yCellOffset += sectionOffset
-            }
-            
-            if headerViewXibs.count > 0 {
-                let headerSize = cachedHeaderSizeForSection(attributes.indexPath.section)
-                yCellOffset += headerSize.height
-            }
-            attributes.frame = CGRect(x: xCellOffset, y: yCellOffset, width: self.itemSize.width, height: self.itemSize.height)
-        }
-    }
-    
-    func sizeForitemAtIndexPath(_ indexPath: IndexPath) -> CGSize {
-        let headerSize = cachedHeaderSizeForSection((indexPath as NSIndexPath).section)
+        // Get header size if it alrady cached
+        var headerSize =  CGSize()
+        if headerViewXibs.count > 0 { headerSize = cachedHeaderSizeForSection(section: indexPath.section) }
+        
         let currentItemSize = itemSize
-        let size = CGSize(width: currentItemSize.width, height: (collectionView!.frame.height - headerSize.height) / CGFloat(numberOfRows))
-        currentCell = (section: (indexPath as NSIndexPath).section, itemSize: size)
+        let size            = CGSize(width: currentItemSize.width, height: (collectionView!.frame.height - headerSize.height) / CGFloat(numberOfRows))
+        currentCell         = (section: indexPath.section, itemSize: size)
         return size
     }
     
+    func sizeOfSection(section: Int)-> CGFloat {
+        var size = CGSize()
+        let headerSizeOfPreviousSection = headerCache[section].frame.height
+        
+        let itemSectionSizeOfPreviousSection = cellCache[section]![0].frame.height * CGFloat(numberOfRows)
+        if scrollDirection == .horizontal {
+            return cellCache[section]![0].frame.width * CGFloat(numberOfColumns)
+        } else {
+            return cellCache[section]![0].frame.height * CGFloat(numberOfRows) + headerSizeOfPreviousSection
+        }
+    }
+    
+    func internalCachedCellSectionFromRectOffset(offset: CGPoint)-> Int {
+        let key =  scrollDirection == .horizontal ? offset.x : offset.y
+        return binarySearch(a: sectionSize, key: key)
+    }
+    
+    func sizeOfContentForSection(section: Int) -> CGFloat {
+        return sizeOfSection(section: section)
+    }
+    
+    func sectionFromRectOffset(offset: CGPoint)-> Int {
+        let theOffet = scrollDirection == .horizontal ? offset.x : offset.y
+        var val: Int = 0
+        for (index, sectionSizeValue) in sectionSize.enumerated() {
+            if theOffet < sectionSizeValue {
+                val = index
+                break
+            }
+        }
+        return val
+    }
+    
+    func binarySearch<T: Comparable>(a: [T], key: T) -> Int {
+        var range = 0..<a.count
+        var midIndex: Int = 0
+        while range.startIndex < range.endIndex {
+            midIndex = range.startIndex + (range.endIndex - range.startIndex) / 2
+            if midIndex + 1  >= a.count || key >= a[midIndex] && key < a[midIndex + 1] ||  a[midIndex] == key {
+                return midIndex
+            } else if a[midIndex] < key {
+                 range = midIndex + 1..<range.endIndex
+            } else {
+                range = range.startIndex..<midIndex
+            }
+        }
+        return midIndex
+    }
     
     /// Returns an object initialized from data in a given unarchiver. self, initialized using the data in decoder.
     required public init?(coder aDecoder: NSCoder) {
@@ -224,7 +310,10 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     func clearCache() {
         headerCache.removeAll()
         cellCache.removeAll()
+        sectionSize.removeAll()
         currentHeader = nil
         currentCell = nil
+        contentHeight = 0
+        contentWidth = 0
     }
 }
