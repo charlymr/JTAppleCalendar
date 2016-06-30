@@ -47,7 +47,6 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         
         // Generate and cache the headers
         for section in 0..<maxSections {
-            
             if headerViewXibs.count > 0 {
                 // generate header views
                 let sectionIndexPath = IndexPath(item: 0, section: section)
@@ -94,12 +93,8 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         for sectionIndex in startSectionIndex..<cellCache.count {
             if let validSection = cellCache[sectionIndex] where validSection.count > 0 {
                 // Add header view attributes
-                
-                var interceptCount: Int  = 0
                 if headerViewXibs.count > 0 {
-                    if headerCache[sectionIndex].frame.intersects(rect) {
-                        attributes.append(headerCache[sectionIndex])
-                    }
+                    if headerCache[sectionIndex].frame.intersects(rect) { attributes.append(headerCache[sectionIndex]) }
                 }
                 
                 for val in validSection {
@@ -109,14 +104,10 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
                         attributes.append(val)
                     } else {
                         missCount += 1
-                        if missCount > maxMissCount && beganIntercepting { // If there are at least 8 misses in a row since intercepting began, then this section has no more interceptions. So break
-                            break
-                        }
+                        if missCount > maxMissCount && beganIntercepting { break }// If there are at least 8 misses in a row since intercepting began, then this section has no more interceptions. So break
                     }
                 }
-                if missCount > maxMissCount && beganIntercepting { // Also break from outter loop
-                    break
-                }
+                if missCount > maxMissCount && beganIntercepting { break }// Also break from outter loop
             }
         }
         return attributes
@@ -143,7 +134,6 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         let headerSize = cachedHeaderSizeForSection(section: indexPath.section)
         var strideOffset: CGFloat = 0
         if indexPath.section > 0 {
-            
             var headerSizeOfPreviousSection: CGFloat
             var itemSectionSizeOfPreviousSection: CGFloat
             
@@ -173,8 +163,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     
     func applyLayoutAttributes(attributes : UICollectionViewLayoutAttributes) {
         if attributes.representedElementKind != nil { return }
-        guard let collectionView = self.collectionView else { return }
-        
+    
         // Calculate the item size
         if let itemSize = delegate!.itemSize {
             if scrollDirection == .vertical {
@@ -247,10 +236,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     }
     
     func sizeOfSection(section: Int)-> CGFloat {
-        var size = CGSize()
         let headerSizeOfPreviousSection = headerCache[section].frame.height
-        
-        let itemSectionSizeOfPreviousSection = cellCache[section]![0].frame.height * CGFloat(numberOfRows)
         if scrollDirection == .horizontal {
             return cellCache[section]![0].frame.width * CGFloat(numberOfColumns)
         } else {
