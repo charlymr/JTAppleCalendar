@@ -60,86 +60,6 @@ public enum DaysOfWeek: Int {
     case sunday = 7, monday = 6, tuesday = 5, wednesday = 4, thursday = 10, friday = 9, saturday = 8
 }
 
-/// The JTAppleCalendarViewDataSource protocol is adopted by an object that mediates the application’s data model for a JTAppleCalendarViewDataSource object. The data source provides the calendar-view object with the information it needs to construct and modify it self
-public protocol JTAppleCalendarViewDataSource {
-    /// Asks the data source to return the start and end boundary dates as well as the calendar to use. You should properly configure your calendar at this point.
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view requesting this information.
-    /// - returns:
-    ///     - startDate: The *start* boundary date for your calendarView.
-    ///     - endDate: The *end* boundary date for your calendarView.
-    ///     - numberOfRows: The number of rows to be displayed per month
-    ///     - calendar: The *calendar* to be used by the calendarView.
-    func configureCalendar(_ calendar: JTAppleCalendarView) -> (startDate: Date, endDate: Date, numberOfRows: Int, calendar: Calendar)
-}
-
-
-/// The delegate of a JTAppleCalendarView object must adopt the JTAppleCalendarViewDelegate protocol.
-/// Optional methods of the protocol allow the delegate to manage selections, and configure the cells.
-public protocol JTAppleCalendarViewDelegate {
-    /// Asks the delegate if selecting the date-cell with a specified date is allowed
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view requesting this information.
-    ///     - date: The date attached to the date-cell.
-    ///     - cell: The date-cell view. This can be customized at this point.
-    ///     - cellState: The month the date-cell belongs to.
-    /// - returns: A Bool value indicating if the operation can be done.
-    func calendar(_ calendar : JTAppleCalendarView, canSelectDate date : Date, cell: JTAppleDayCellView, cellState: CellState) -> Bool
-    /// Asks the delegate if de-selecting the date-cell with a specified date is allowed
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view requesting this information.
-    ///     - date: The date attached to the date-cell.
-    ///     - cell: The date-cell view. This can be customized at this point.
-    ///     - cellState: The month the date-cell belongs to.
-    /// - returns: A Bool value indicating if the operation can be done.
-    func calendar(_ calendar : JTAppleCalendarView, canDeselectDate date : Date, cell: JTAppleDayCellView, cellState: CellState) -> Bool
-    /// Tells the delegate that a date-cell with a specified date was selected
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view giving this information.
-    ///     - date: The date attached to the date-cell.
-    ///     - cell: The date-cell view. This can be customized at this point. This may be nil if the selected cell is off the screen
-    ///     - cellState: The month the date-cell belongs to.
-    func calendar(_ calendar : JTAppleCalendarView, didSelectDate date : Date, cell: JTAppleDayCellView?, cellState: CellState) -> Void
-    /// Tells the delegate that a date-cell with a specified date was de-selected
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view giving this information.
-    ///     - date: The date attached to the date-cell.
-    ///     - cell: The date-cell view. This can be customized at this point. This may be nil if the selected cell is off the screen
-    ///     - cellState: The month the date-cell belongs to.
-    func calendar(_ calendar : JTAppleCalendarView, didDeselectDate date : Date, cell: JTAppleDayCellView?, cellState: CellState) -> Void
-    /// Tells the delegate that the JTAppleCalendar view scrolled to a segment beginning and ending with a particular date
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view giving this information.
-    ///     - startDate: The date at the start of the segment.
-    ///     - endDate: The date at the end of the segment.
-    func calendar(_ calendar : JTAppleCalendarView, didScrollToDateSegmentStartingWithdate startDate: Date, endingWithDate endDate: Date) -> Void
-    /// Tells the delegate that the JTAppleCalendar is about to display a date-cell. This is the point of customization for your date cells
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view giving this information.
-    ///     - cell: The date-cell that is about to be displayed.
-    ///     - date: The date attached to the cell.
-    ///     - cellState: The month the date-cell belongs to.
-    func calendar(_ calendar : JTAppleCalendarView, isAboutToDisplayCell cell: JTAppleDayCellView, date:Date, cellState: CellState) -> Void
-    /// Implement this function to use headers in your project. Return your registered header for the date presented.
-    /// - Parameters:
-    ///     - date: Contains the startDate and endDate for the header that is about to be displayed
-    /// - Returns:
-    ///   String: Provide the registered header you wish to show for this date
-    func calendar(_ calendar : JTAppleCalendarView, sectionHeaderIdentifierForDate date: (startDate: Date, endDate: Date)) -> String?
-    /// Implement this function to use headers in your project. Return the size for the header you wish to present
-    /// - Parameters:
-    ///     - date: Contains the startDate and endDate for the header that is about to be displayed
-    /// - Returns:
-    ///   CGSize: Provide the size for the header you wish to show for this date
-    func calendar(_ calendar : JTAppleCalendarView, sectionHeaderSizeForDate date: (startDate: Date, endDate: Date)) -> CGSize
-    /// Tells the delegate that the JTAppleCalendar is about to display a header. This is the point of customization for your headers
-    /// - Parameters:
-    ///     - calendar: The JTAppleCalendar view giving this information.
-    ///     - header: The header view that is about to be displayed.
-    ///     - date: The date attached to the header.
-    ///     - identifier: The identifier you provided for the header
-    func calendar(_ calendar : JTAppleCalendarView, isAboutToDisplaySectionHeader header: JTAppleHeaderView, date: (startDate: Date, endDate: Date), identifier: String) -> Void
-}
 /// Default delegate functions
 public extension JTAppleCalendarViewDelegate {
     func calendar(_ calendar : JTAppleCalendarView, canSelectDate date : Date, cell: JTAppleDayCellView, cellState: CellState)->Bool {return true}
@@ -236,7 +156,7 @@ public class JTAppleCalendarView: UIView {
             return (startDate: Date(), endDate: Date(), 0, Calendar(calendarIdentifier: "nil" as Calendar.Identifier)!)
         }
         
-        return (startDate: config.startDate, endDate: config.endDate, numberOfRows: config.numberOfRows, calendar: config.calendar)
+        return (startDate: config.startDate as Date, endDate: config.endDate as Date, numberOfRows: config.numberOfRows, calendar: config.calendar)
         }()
     
     // Set the start of the month
@@ -327,7 +247,6 @@ public class JTAppleCalendarView: UIView {
         }
 
         layout.itemSize = CGSize(width: width, height: height)
-        self.calendarView.collectionViewLayout = layout as! UICollectionViewLayout
     }
     
     /// The frame rectangle which defines the view's location and size in its superview coordinate system.
@@ -470,43 +389,59 @@ public class JTAppleCalendarView: UIView {
     }
     
     func reloadData(checkDelegateDataSource check: Bool, withAnchorDate anchorDate: Date? = nil, withAnimation animation: Bool = false, completionHandler:(()->Void)? = nil) {
-        if check {
-            reloadDelegateDataSource() // Reload the datasource
+        // Reload the datasource
+        if check { reloadDelegateDataSource() }
+        var layoutWasUpdated: Bool?
+        if layoutNeedsUpdating {
+            self.configureChangeOfRows()
+            self.layoutNeedsUpdating = false
+            layoutWasUpdated = true
+        }
+        // Reload the data
+        self.calendarView.reloadData()
+        
+        // Restore the selected index paths
+        for indexPath in theSelectedIndexPaths {
+            restoreSelectionStateForCellAtIndexPath(indexPath)
         }
         
-        // Delay on main thread. We want this to be called after the view is displayed on the main run loop
-        if layoutNeedsUpdating {
-            delayRunOnMainThread(delay: 0.0, closure: {
-                if !self.scrollInProgress { // Make sure this scroll only gets activated if no other scroll is in queue
-                    self.configureChangeOfRows()
-                    
-                    guard let validAnchorDate = anchorDate else { // If the date is invalid just scroll to the the first item on the view or scroll to the start of a header (if header is enabled)
-                        if headerViewXibs.count < 1 {
-                            self.scrollToDate(self.startOfMonthCache, triggerScrollToDateDelegate: false, animateScroll: animation, completionHandler: completionHandler)
-                        } else {
-                            self.scrollToHeaderForDate(self.startOfMonthCache, triggerScrollToDateDelegate: false, withAnimation: animation, completionHandler: completionHandler)
-                        }
-                        return
-                    }
-                    
-                    delayRunOnMainThread(delay: 0.0, closure: { () -> () in
-                        self.scrollToDate(validAnchorDate, triggerScrollToDateDelegate: false, animateScroll: animation, completionHandler: completionHandler)
-                    })
+        delayRunOnMainThread(delay: 0.0) {
+            let scrollToDate = {(date: NSDate) -> Void in
+                if headerViewXibs.count < 1 {
+                    self.scrollToDate(date as Date, triggerScrollToDateDelegate: false, animateScroll: animation, completionHandler: completionHandler)
                 } else {
-                    if let validHandler = completionHandler {
-                        self.delayedExecutionClosure.append(validHandler)
+                    self.scrollToHeaderForDate(date as Date, triggerScrollToDateDelegate: false, withAnimation: animation, completionHandler: completionHandler)
+                }
+            }
+            if let validAnchorDate = anchorDate { // If we have a valid anchor dat, this means we want to scroll
+                // This scroll should happen after the reload above
+                scrollToDate(validAnchorDate)
+            } else {
+                if layoutWasUpdated == true {
+                    // This is a scroll done after a layout reset and dev didnt set an anchor date. If a scroll is in progress, then cancel this one and
+                    // allow it to take precedent
+                    if !self.scrollInProgress {
+                        scrollToDate(self.startOfMonthCache)
+                    } else {
+                        if let validCompletionHandler = completionHandler { self.delayedExecutionClosure.append(validCompletionHandler) }
+                    }
+                } else {
+                    if let validCompletionHandler = completionHandler {
+                        if self.scrollInProgress {
+                            self.delayedExecutionClosure.append(validCompletionHandler)
+                        } else {
+                            validCompletionHandler()
+                        }
                     }
                 }
-                
-                // Set layoutNeedsUpdating to false
-                self.layoutNeedsUpdating = false
-            })
-        } else {
-            if dataSource == nil {
-                (calendarView.collectionViewLayout as! JTAppleCalendarLayoutProtocol).clearCache()
-                calendarView.reloadData()
             }
         }
+    }
+    
+    func executeDelayedTasks() {
+        let tasksToExecute = delayedExecutionClosure
+        for aTaskToExecute in tasksToExecute { aTaskToExecute() }
+        delayedExecutionClosure.removeAll()
     }
     
     private func reloadDelegateDataSource() {
@@ -530,12 +465,17 @@ public class JTAppleCalendarView: UIView {
     }
     
     func configureChangeOfRows() {
-        theSelectedDates.removeAll()
-        theSelectedIndexPaths.removeAll()
         let layout = calendarView.collectionViewLayout as! JTAppleCalendarLayoutProtocol
         layout.clearCache()
         monthInfo = setupMonthInfoDataForStartAndEndDate()
-        self.calendarView.reloadData()
+        
+        // Only remove the selected dates and paths if the new layout does nto contain the date
+        if pathsFromDates(theSelectedDates).count != theSelectedIndexPaths.count {
+            theSelectedDates.removeAll()
+            theSelectedIndexPaths.removeAll()
+        }
+
+        
     }
     
     func calendarViewHeaderSizeForSection(_ section: Int) -> CGSize {
@@ -644,7 +584,7 @@ public class JTAppleCalendarView: UIView {
         var retval: [[Int]] = []
         if var validConfig = dataSource?.configureCalendar(self) {
             // check if the dates are in correct order
-            if validConfig.calendar.compare(validConfig.startDate, to: validConfig.endDate, toUnitGranularity: Calendar.Unit.nanosecond) == ComparisonResult.orderedDescending {
+            if validConfig.calendar.compare(validConfig.startDate as Date, to: validConfig.endDate as Date, toUnitGranularity: Calendar.Unit.nanosecond) == ComparisonResult.orderedDescending {
                 assert(false, "Error, your start date cannot be greater than your end date\n")
                 return retval
             }
@@ -658,7 +598,7 @@ public class JTAppleCalendarView: UIView {
             }
             
             // Set the new cache
-            cachedConfiguration = validConfig
+            cachedConfiguration = validConfig as! (startDate: Date, endDate: Date, numberOfRows: Int, calendar: Calendar)
             
             if let
                 startMonth = Date.startOfMonthForDate(date: validConfig.startDate, usingCalendar: validConfig.calendar),
@@ -737,7 +677,6 @@ public class JTAppleCalendarView: UIView {
     
     func pathsFromDates(_ dates:[Date])-> [IndexPath] {
         var returnPaths: [IndexPath] = []
-        
         for date in dates {
             if date >= startOfMonthCache && date <= endOfMonthCache {
                 let periodApart = calendar.components(.month, from: startOfMonthCache, to: date, options: [])
@@ -758,7 +697,6 @@ public class JTAppleCalendarView: UIView {
                 returnPaths.append(IndexPath(item: adjustedCellIndex, section: adjustedSection))
             }
         }
-        
         return returnPaths
     }
 }

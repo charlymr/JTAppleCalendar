@@ -47,13 +47,10 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         
         // Generate and cache the headers
         for section in 0..<maxSections {
-            if headerViewXibs.count > 0 {
-                // generate header views
-                let sectionIndexPath = IndexPath(item: 0, section: section)
-                if let aHeaderAttr = layoutAttributesForSupplementaryView(ofKind: UICollectionElementKindSectionHeader, at: sectionIndexPath) {
-                    headerCache.append(aHeaderAttr)
-                    if scrollDirection == .vertical { contentHeight += aHeaderAttr.frame.height } else { contentWidth += aHeaderAttr.frame.width }
-                }
+            let sectionIndexPath = IndexPath(item: 0, section: section)
+            if let aHeaderAttr = layoutAttributesForSupplementaryView(ofKind: UICollectionElementKindSectionHeader, at: sectionIndexPath) {
+                headerCache.append(aHeaderAttr)
+                if scrollDirection == .vertical { contentHeight += aHeaderAttr.frame.height } else { contentWidth += aHeaderAttr.frame.width }
             }
             
             // Generate and cache the cells
@@ -67,12 +64,11 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
                     cellCache[section]!.append(attribute)
                 }
             }
-            
             // Save the content size for each section
             sectionSize.append(scrollDirection == .horizontal ? contentWidth : contentHeight)
             
         }
-        
+        if headerViewXibs.count < 1 { headerCache.removeAll() } // Get rid of header data if dev didnt register headers. The were used for calculation but are not needed to be displayed
         if scrollDirection == .horizontal { contentHeight = self.collectionView!.bounds.size.height } else { contentWidth = self.collectionView!.bounds.size.width }
     }
     
@@ -121,7 +117,6 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         if let alreadyCachedCellAttrib = cellCache[indexPath.section] where indexPath.item < alreadyCachedCellAttrib.count {
             return alreadyCachedCellAttrib[indexPath.item!]
         }
-        
         applyLayoutAttributes(attributes: attr)
         return attr
     }
@@ -204,9 +199,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         } else {
             yCellOffset += stride
         }
-        
         attributes.frame = CGRect(x: xCellOffset, y: yCellOffset, width: self.itemSize.width, height: self.itemSize.height)
-        
     }
     
     func cachedHeaderSizeForSection(section: Int) -> CGSize {
@@ -228,7 +221,6 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         // Get header size if it alrady cached
         var headerSize =  CGSize()
         if headerViewXibs.count > 0 { headerSize = cachedHeaderSizeForSection(section: indexPath.section) }
-        
         let currentItemSize = itemSize
         let size            = CGSize(width: currentItemSize.width, height: (collectionView!.frame.height - headerSize.height) / CGFloat(numberOfRows))
         currentCell         = (section: indexPath.section, itemSize: size)

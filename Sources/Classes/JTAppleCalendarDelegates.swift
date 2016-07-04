@@ -133,14 +133,6 @@ extension JTAppleCalendarView: UIScrollViewDelegate {
         let currentSegmentDates = currentCalendarDateSegment()
         self.delegate?.calendar(self, didScrollToDateSegmentStartingWithdate: currentSegmentDates.startDate, endingWithDate: currentSegmentDates.endDate)
     }
-    
-    func executeDelayedTasks() {
-        let tasksToExecute = delayedExecutionClosure
-        for aTaskToExecute in tasksToExecute {
-            aTaskToExecute()
-        }
-        delayedExecutionClosure.removeAll()
-    }
 }
 
 // MARK: CollectionView delegates
@@ -175,8 +167,6 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
     
     /// Asks your data source object for the cell that corresponds to the specified item in the collection view.
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        restoreSelectionStateForCellAtIndexPath(indexPath)
-        
         let dayCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as! JTAppleDayCell
         let date = dateFromPath(indexPath)!
         let cellState = cellStateFromIndexPath(indexPath, withDate: date)
