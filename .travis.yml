@@ -11,4 +11,3 @@ script:
     -configuration Debug ONLY_ACTIVE_ARCH=NO test | xcpretty -c
  notifications:
   email: false
-
