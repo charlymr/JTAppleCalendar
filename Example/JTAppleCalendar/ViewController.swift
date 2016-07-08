@@ -110,7 +110,7 @@ class ViewController: UIViewController {
     func setupViewsOfCalendar(_ startDate: Date, endDate: Date) {
         let month = testCalendar.component(Calendar.Unit.month, from: startDate)
         let monthName = DateFormatter().monthSymbols[(month-1) % 12] // 0 indexed array
-        let year = Calendar.current().component(Calendar.Unit.year, from: startDate)
+        let year = Calendar.current.component(Calendar.Unit.year, from: startDate)
         monthLabel.text = monthName + " " + String(year)
     }
 }
@@ -121,7 +121,7 @@ extension ViewController: JTAppleCalendarViewDataSource, JTAppleCalendarViewDele
         
         let firstDate = formatter.date(from: "2016 01 01")
         let secondDate = Date()
-        let aCalendar = Calendar.current() // Properly configure your calendar to your time zone here
+        let aCalendar = Calendar.current // Properly configure your calendar to your time zone here
         return (startDate: firstDate!, endDate: secondDate, numberOfRows: numberOfRows, calendar: aCalendar)
     }
 

@@ -82,7 +82,7 @@ extension JTAppleCalendarView {
         }
 
         for headerViewXibName in headerViewXibNames {
-            let viewObject = Bundle.main().loadNibNamed(headerViewXibName, owner: self, options: [:])
+            let viewObject = Bundle.main.loadNibNamed(headerViewXibName, owner: self, options: [:])
             assert(viewObject.count > 0, "your nib file name \(headerViewXibName) could not be loaded)")
             
             guard viewObject[0] is JTAppleHeaderView else {

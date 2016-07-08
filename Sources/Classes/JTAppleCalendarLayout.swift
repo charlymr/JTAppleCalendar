@@ -115,7 +115,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         
         // If this index is already cached, then return it else, apply a new layout attribut to it
         if let alreadyCachedCellAttrib = cellCache[indexPath.section] where indexPath.item < alreadyCachedCellAttrib.count {
-            return alreadyCachedCellAttrib[indexPath.item!]
+            return alreadyCachedCellAttrib[indexPath.item]
         }
         applyLayoutAttributes(attributes: attr)
         return attr
@@ -185,8 +185,8 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
             stride = scrollDirection == .horizontal ? CGFloat(attributes.indexPath.section) * itemSize.width * CGFloat(numberOfColumns): CGFloat(attributes.indexPath.section) * itemSize.height * CGFloat(numberOfRows)
         }
         
-        var xCellOffset : CGFloat = CGFloat(attributes.indexPath.item! % MAX_NUMBER_OF_DAYS_IN_WEEK) * self.itemSize.width
-        var yCellOffset :CGFloat = CGFloat(attributes.indexPath.item! / MAX_NUMBER_OF_DAYS_IN_WEEK) * self.itemSize.height
+        var xCellOffset : CGFloat = CGFloat(attributes.indexPath.item % MAX_NUMBER_OF_DAYS_IN_WEEK) * self.itemSize.width
+        var yCellOffset :CGFloat = CGFloat(attributes.indexPath.item / MAX_NUMBER_OF_DAYS_IN_WEEK) * self.itemSize.height
         
         if scrollDirection == .horizontal {
             xCellOffset += stride

@@ -559,7 +559,7 @@ public class JTAppleCalendarView: UIView {
         switch cellViewSource {
         case let .fromXib(xibName):
             // "your nib file name \(cellViewXibName) could not be loaded)"
-            let viewObject = Bundle.main().loadNibNamed(xibName, owner: self, options: [:])
+            let viewObject = Bundle.main.loadNibNamed(xibName, owner: self, options: [:])
             guard viewObject.count > 0 else { return false }
             // "xib file class does not conform to the protocol<JTAppleDayCellViewProtocol>"
             guard let _ = viewObject[0] as? JTAppleDayCellView else { return false }
@@ -598,7 +598,7 @@ public class JTAppleCalendarView: UIView {
             }
             
             // Set the new cache
-            cachedConfiguration = validConfig as! (startDate: Date, endDate: Date, numberOfRows: Int, calendar: Calendar)
+            cachedConfiguration = validConfig 
             
             if let
                 startMonth = Date.startOfMonthForDate(date: validConfig.startDate, usingCalendar: validConfig.calendar),
