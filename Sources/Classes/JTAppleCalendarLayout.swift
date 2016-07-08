@@ -238,7 +238,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     
     func internalCachedCellSectionFromRectOffset(offset: CGPoint)-> Int {
         let key =  scrollDirection == .horizontal ? offset.x : offset.y
-        return binarySearch(a: sectionSize, key: key)
+        return startIndexBinarySearch(a: sectionSize, offset: key)
     }
     
     func sizeOfContentForSection(section: Int) -> CGFloat {
@@ -257,15 +257,16 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         return val
     }
     
-    func binarySearch<T: Comparable>(a: [T], key: T) -> Int {
+    func startIndexBinarySearch<T: Comparable>(a: [T], offset: T) -> Int {
+        if a.count < 3 { return 0} // If the range is less than 2 just break here.
         var range = 0..<a.count
         var midIndex: Int = 0
         while range.startIndex < range.endIndex {
             midIndex = range.startIndex + (range.endIndex - range.startIndex) / 2
-            if midIndex + 1  >= a.count || key >= a[midIndex] && key < a[midIndex + 1] ||  a[midIndex] == key {
-                return midIndex
-            } else if a[midIndex] < key {
-                 range = midIndex + 1..<range.endIndex
+            if midIndex + 1  >= a.count || offset >= a[midIndex] && offset < a[midIndex + 1] ||  a[midIndex] == offset {
+                break
+            } else if a[midIndex] < offset {
+                range = midIndex + 1..<range.endIndex
             } else {
                 range = range.startIndex..<midIndex
             }

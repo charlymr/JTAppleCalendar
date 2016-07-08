@@ -52,12 +52,14 @@ public struct CellState {
     public let column: ()->Int
     /// returns the section the date cell belongs to
     public let dateSection: ()->(startDate: Date, endDate: Date)
+    /// returns the cell frame. Useful if you wish to display something at the cell's frame/position
+    public let frame: ()->CGRect?
 }
 
 /// Days of the week. By setting you calandar's first day of week, you can change which day is the first for the week. Sunday is by default.
 public enum DaysOfWeek: Int {
     /// Days of the week.
-    case sunday = 7, monday = 6, tuesday = 5, wednesday = 4, thursday = 10, friday = 9, saturday = 8
+    case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
 }
 
 /// Default delegate functions
@@ -118,7 +120,7 @@ public class JTAppleCalendarView: UIView {
     public var numberOfRowsPerMonth: Int = 0
     
     /// The object that acts as the data source of the calendar view.
-    public var dataSource : JTAppleCalendarViewDataSource? {
+    weak public var dataSource : JTAppleCalendarViewDataSource? {
         didSet {
             monthInfo = setupMonthInfoDataForStartAndEndDate()
             updateLayoutItemSize(calendarView.collectionViewLayout as! JTAppleCalendarLayout)
@@ -126,7 +128,7 @@ public class JTAppleCalendarView: UIView {
         }
     }
     /// The object that acts as the delegate of the calendar view.
-    public var delegate: JTAppleCalendarViewDelegate?
+    weak public var delegate: JTAppleCalendarViewDelegate?
 
     var dateComponents = DateComponents()
     var delayedExecutionClosure: [(()->Void)] = []
@@ -388,6 +390,19 @@ public class JTAppleCalendarView: UIView {
         }
     }
     
+    func generatedDateRange(from startDate: Date, to endDate:Date)-> [NSDate] {
+        var days = NSDateComponents()
+        var dayCount = Date.numberOfDaysDifferenceBetweenFirstDate(firstDate: startDate, secondDate: endDate, usingCalendar: calendar)
+        var returnDates: [NSDate] = []
+        
+        for index in 0...dayCount {
+            days.day = index
+            let date = calendar.date(byAdding: days as DateComponents, to: startDate as Date, options: [])!
+            returnDates.append(date)
+        }
+        return returnDates
+    }
+    
     func reloadData(checkDelegateDataSource check: Bool, withAnchorDate anchorDate: Date? = nil, withAnimation animation: Bool = false, completionHandler:(()->Void)? = nil) {
         // Reload the datasource
         if check { reloadDelegateDataSource() }
@@ -572,6 +587,19 @@ public class JTAppleCalendarView: UIView {
         }
     }
     
+    func scrollToSection(section: Int, triggerScrollToDateDelegate: Bool = false, animateScroll: Bool = true, completionHandler: (()->Void)?) {
+        if scrollInProgress { return }
+        let position: UICollectionViewScrollPosition = self.direction == .horizontal ? .left : .top
+        if let validHandler = completionHandler {
+            delayedExecutionClosure.append(validHandler)
+        }
+        
+        if let date = dateFromPath(IndexPath(item: MAX_NUMBER_OF_DAYS_IN_WEEK - 1, section:section)) {
+            let recalcDate = Date.startOfMonthForDate(date: date, usingCalendar: calendar)!
+            self.scrollToDate(recalcDate as Date, triggerScrollToDateDelegate: triggerScrollToDateDelegate, animateScroll: animateScroll, preferredScrollPosition: nil, completionHandler: completionHandler)
+        }
+    }
+    
     func generateNewLayout() -> UICollectionViewLayout {
         let layout: UICollectionViewLayout = JTAppleCalendarLayout(withDelegate: self)
         let conformingProtocolLayout = layout as! JTAppleCalendarLayoutProtocol
@@ -632,7 +660,16 @@ public class JTAppleCalendarView: UIView {
                         
                         var firstWeekdayOfMonthIndex = validConfig.calendar.component(.weekday, from: correctMonthForSectionDate)
                         firstWeekdayOfMonthIndex -= 1 // firstWeekdayOfMonthIndex should be 0-Indexed
-                        firstWeekdayOfMonthIndex = (firstWeekdayOfMonthIndex + firstDayOfWeek.rawValue) % 7 // push it modularly so that we take it back one day so that the first day is Monday instead of Sunday which is the default
+                        
+
+                        var firstDayCalValue = 0
+                        switch firstDayOfWeek {
+                            case .monday: firstDayCalValue = 6 case .tuesday: firstDayCalValue = 5 case .wednesday: firstDayCalValue = 4
+                            case .thursday: firstDayCalValue = 10 case .friday: firstDayCalValue = 9
+                            case .saturday: firstDayCalValue = 8 default: firstDayCalValue = 7
+                        }
+                        
+                        firstWeekdayOfMonthIndex = (firstWeekdayOfMonthIndex + firstDayCalValue) % 7 // push it modularly so that we take it back one day so that the first day is Monday instead of Sunday which is the default
                         
                         
                         // We have number of days in month, now lets see how these days will be allotted into the number of sections in the month
@@ -702,14 +739,14 @@ public class JTAppleCalendarView: UIView {
 }
 
 extension JTAppleCalendarView {
-    func cellStateFromIndexPath(_ indexPath: IndexPath, withDate date: Date)->CellState {
-        let itemIndex = (indexPath as NSIndexPath).item
-        let itemSection = (indexPath as NSIndexPath).section
+    func cellStateFromIndexPath(indexPath: NSIndexPath, withDate date: NSDate, cell: JTAppleDayCell? = nil)->CellState {
+        let itemIndex = indexPath.item
+        let itemSection = indexPath.section
         let currentMonthInfo = monthInfo[itemSection]
         let fdIndex = currentMonthInfo[FIRST_DAY_INDEX]
         let nDays = currentMonthInfo[NUMBER_OF_DAYS_INDEX]
-        let componentDay = calendar.component(.day, from: date)
-        let componentWeekDay = calendar.component(.weekday, from: date)
+        let componentDay = calendar.component(.day, from: date as Date)
+        let componentWeekDay = calendar.component(.weekday, from: date as Date)
         let cellText = String(componentDay)
         let dateBelongsTo: CellState.DateOwner
         
@@ -725,30 +762,18 @@ extension JTAppleCalendarView {
             dateBelongsTo = .followingMonthOutsideBoundary
         }
         
-        let dayOfWeek: DaysOfWeek
-        switch componentWeekDay {
-        case 1:  dayOfWeek = .sunday
-        case 2:  dayOfWeek = .monday
-        case 3:  dayOfWeek = .tuesday
-        case 4:  dayOfWeek = .wednesday
-        case 5:  dayOfWeek = .thursday
-        case 6:  dayOfWeek = .friday
-        default: dayOfWeek = .saturday
-        }
-        
-        let row = {()->Int in return itemIndex / MAX_NUMBER_OF_DAYS_IN_WEEK }
-        let column = {()->Int in return itemIndex % MAX_NUMBER_OF_DAYS_IN_WEEK }
-        let monthSection = {()->(startDate: Date, endDate: Date) in return self.dateFromSection(itemSection)! }
-        
+        let dayOfWeek = DaysOfWeek(rawValue: componentWeekDay)!
+
         let cellState = CellState(
-            isSelected: theSelectedIndexPaths.contains(indexPath),
+            isSelected: theSelectedIndexPaths.contains(indexPath as IndexPath),
             text: cellText,
             dateBelongsTo: dateBelongsTo,
-            date: date,
+            date: date as Date,
             day: dayOfWeek,
-            row: row,
-            column: column,
-            dateSection: monthSection
+            row: {()->Int in return itemIndex / MAX_NUMBER_OF_DAYS_IN_WEEK },
+            column: {()->Int in return itemIndex % MAX_NUMBER_OF_DAYS_IN_WEEK },
+            dateSection: {()->(startDate: Date, endDate: Date) in return self.dateFromSection(itemSection)! },
+            frame: {()->CGRect? in return cell?.frame}
         )
         return cellState
     }
