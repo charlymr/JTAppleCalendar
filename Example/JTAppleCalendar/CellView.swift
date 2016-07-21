@@ -44,7 +44,7 @@ class CellView: JTAppleDayCellView {
         delayRunOnMainThread(0.0) {
             self.configueViewIntoBubbleView(cellState)
         }
-        
+    
         // Configure Visibility
         configureVisibility(cellState)
         
@@ -75,6 +75,7 @@ class CellView: JTAppleDayCellView {
         } else {
             self.isHidden = false
         }
+        
     }
     
     func configureTextColor(_ cellState: CellState) {
@@ -91,9 +92,7 @@ class CellView: JTAppleDayCellView {
         if cellState.isSelected == true {
             if selectedView.isHidden == true {
                 configueViewIntoBubbleView(cellState)
-                self.isUserInteractionEnabled = false
                 selectedView.animateWithBounceEffect(withCompletionHandler: {
-                    self.isUserInteractionEnabled = true
                 })
             }
         } else {
@@ -111,10 +110,8 @@ class CellView: JTAppleDayCellView {
             if animateDeselection {
                 configureTextColor(cellState)
                 if selectedView.isHidden == false {
-                    self.isUserInteractionEnabled = false
                     selectedView.animateWithFadeEffect(withCompletionHandler: { () -> Void in
-                        self.isUserInteractionEnabled = true
-                        self.selectedView.isHidden = true
+                self.selectedView.isHidden = true
                         self.selectedView.alpha = 1
                     })
                 }

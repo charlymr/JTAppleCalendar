@@ -15,17 +15,17 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     var maxSections: Int = 0
     var daysPerSection: Int = 0
     
-    var numberOfColumns: Int { get { return delegate!.numberOfColumns() } }
-    var numberOfMonthsInCalendar: Int { get { return delegate!.numberOfMonthsInCalendar() } }
-    var numberOfSectionsPerMonth: Int { get { return delegate!.numberOfsectionsPermonth() } }
-    var numberOfDaysPerSection: Int { get { return delegate!.numberOfDaysPerSection() } }
-    var numberOfRows: Int { get { return delegate!.numberOfRows() } }
+    var numberOfColumns: Int { get { return delegate.numberOfColumns() } }
+    var numberOfMonthsInCalendar: Int { get { return delegate.numberOfMonthsInCalendar() } }
+    var numberOfSectionsPerMonth: Int { get { return delegate.numberOfsectionsPermonth() } }
+    var numberOfDaysPerSection: Int { get { return delegate.numberOfDaysPerSection() } }
+    var numberOfRows: Int { get { return delegate.numberOfRows() } }
     
     var cellCache: [Int:[UICollectionViewLayoutAttributes]] = [:]
     var headerCache: [UICollectionViewLayoutAttributes] = []
     var sectionSize: [CGFloat] = []
     
-    weak var delegate: JTAppleCalendarDelegateProtocol?
+    weak var delegate: JTAppleCalendarDelegateProtocol!
     
     var currentHeader: (section: Int, size: CGSize)? // Tracks the current header size
     var currentCell: (section: Int, itemSize: CGSize)? // Tracks the current cell size
@@ -173,7 +173,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         // Calculate the item stride
         var stride: CGFloat = 0
         
-        if headerViewXibs.count > 0 { // If we have headers the cell must start under the header
+        if delegate.registeredHeaderViews.count > 0 { // If we have headers the cell must start under the header
             let headerSize = headerCache[attributes.indexPath.section].frame.height
             let headerOrigin = headerCache[attributes.indexPath.section].frame.origin.y
             if scrollDirection == .vertical { // Headers will affect the stride of Vertical NOT Horizontal
@@ -193,7 +193,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
             
             // Headers will affect the start origin of Horizontal layout. Vertical layout is already accounted for in the stride because
             // you are scrolling in the same direction as the headers height. Thus, headers affect vertical stride, while it affects Horizontal offsets
-            if headerViewXibs.count > 0 {
+            if delegate.registeredHeaderViews.count > 0 {
                 yCellOffset += headerCache[attributes.indexPath.section].frame.height // Adjust the y ofset
             }
         } else {
