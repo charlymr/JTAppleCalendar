@@ -31,10 +31,10 @@ class Tests: XCTestCase {
     
     func testToMakeSureStringAppends() {
         var s1 = "Foo";
-        let expectation = self.expectation(withDescription: "Handler called")
+        let expectation = self.expectation(description: "Handler called")
         s1 = s1 + "sd"
         expectation.fulfill()
-        waitForExpectations(withTimeout: 0.1, handler:nil)
+        waitForExpectations(timeout: 0.1, handler:nil)
     }
 
     

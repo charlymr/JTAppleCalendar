@@ -32,9 +32,9 @@ public class JTAppleDayCell: UICollectionViewCell {
 		switch cellSource {
 		case let .fromXib(xibName):
 			let viewObject = Bundle.main.loadNibNamed(xibName, owner: self, options: [:])
-			assert(viewObject.count > 0, "your nib file name \(xibName) could not be loaded)")
+			assert(viewObject?.count > 0, "your nib file name \(xibName) could not be loaded)")
 
-			guard let view = viewObject[0] as? JTAppleDayCellView else {
+			guard let view = viewObject?[0] as? JTAppleDayCellView else {
 				print("xib file class does not conform to the protocol<JTAppleDayCellViewProtocol>")
 				assert(false)
 				return

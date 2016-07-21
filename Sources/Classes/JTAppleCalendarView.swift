@@ -310,7 +310,7 @@ public class JTAppleCalendarView: UIView {
         let startIndex = IndexPath(item: fdIndex, section: section)
         let endIndex = IndexPath(item: fdIndex + itemLength - 1, section: section)
         
-        if let theStartDate = dateFromPath(startIndex), theEndDate = dateFromPath(endIndex) {
+        if let theStartDate = dateFromPath(startIndex), let theEndDate = dateFromPath(endIndex) {
             return (theStartDate, theEndDate)
         }
         return nil
@@ -381,7 +381,7 @@ public class JTAppleCalendarView: UIView {
                 } else {
                     // If the scroll is set to animate, and the target content offset is already on the screen, then the didFinishScrollingAnimation
                     // delegate will not get called. Once animation is on let's force a scroll so the delegate MUST get caalled
-                    if let check = self.calendarOffsetIsAlreadyAtScrollPosition(forOffset: topOfHeader) where check == true {
+                    if let check = self.calendarOffsetIsAlreadyAtScrollPosition(forOffset: topOfHeader), check == true {
                         self.scrollViewDidEndScrollingAnimation(self.calendarView)
                         self.scrollInProgress = false
                     }
@@ -391,8 +391,8 @@ public class JTAppleCalendarView: UIView {
     }
     
     func generatedDateRange(from startDate: Date, to endDate:Date)-> [NSDate] {
-        var days = NSDateComponents()
-        var dayCount = Date.numberOfDaysDifferenceBetweenFirstDate(firstDate: startDate, secondDate: endDate, usingCalendar: calendar)
+        let days = NSDateComponents()
+        let dayCount = Date.numberOfDaysDifferenceBetweenFirstDate(firstDate: startDate, secondDate: endDate, usingCalendar: calendar)
         var returnDates: [NSDate] = []
         
         for index in 0...dayCount {
@@ -496,7 +496,7 @@ public class JTAppleCalendarView: UIView {
     func calendarViewHeaderSizeForSection(_ section: Int) -> CGSize {
         var retval = CGSize.zero
         if headerViewXibs.count > 0 {
-            if let date = dateFromSection(section), size = delegate?.calendar(self, sectionHeaderSizeForDate: date){ retval = size }
+            if let date = dateFromSection(section), let size = delegate?.calendar(self, sectionHeaderSizeForDate: date){ retval = size }
         }
         return retval
     }
@@ -515,7 +515,7 @@ public class JTAppleCalendarView: UIView {
                 if case 1 >= dayIndex && dayIndex <= 13 = true { // then check the previous month
                     // get the index path of the last day of the previous month
                     
-                    guard let prevMonth = calendar.date(byAdding: .month, value: -1, to: date, options: []) where prevMonth >= startOfMonthCache && prevMonth <= endOfMonthCache else {
+                    guard let prevMonth = calendar.date(byAdding: .month, value: -1, to: date, options: []), prevMonth >= startOfMonthCache && prevMonth <= endOfMonthCache else {
                         return retval
                     }
                     
@@ -535,7 +535,7 @@ public class JTAppleCalendarView: UIView {
                         print("out of range error in indexPathOfdateCellCounterPart() upper. This should not happen. Contact developer on github")
                     }
                 } else if case 26 >= dayIndex && dayIndex <= 31 = true { // check the following month
-                    guard let followingMonth = calendar.date(byAdding: .month, value: 1, to: date, options: []) where followingMonth >= startOfMonthCache && followingMonth <= endOfMonthCache else {
+                    guard let followingMonth = calendar.date(byAdding: .month, value: 1, to: date, options: []), followingMonth >= startOfMonthCache && followingMonth <= endOfMonthCache else {
                         return retval
                     }
                     
@@ -575,9 +575,9 @@ public class JTAppleCalendarView: UIView {
         case let .fromXib(xibName):
             // "your nib file name \(cellViewXibName) could not be loaded)"
             let viewObject = Bundle.main.loadNibNamed(xibName, owner: self, options: [:])
-            guard viewObject.count > 0 else { return false }
+            guard viewObject?.count > 0 else { return false }
             // "xib file class does not conform to the protocol<JTAppleDayCellViewProtocol>"
-            guard let _ = viewObject[0] as? JTAppleDayCellView else { return false }
+            guard let _ = viewObject?[0] as? JTAppleDayCellView else { return false }
             
             return true
         default:
@@ -589,7 +589,7 @@ public class JTAppleCalendarView: UIView {
     
     func scrollToSection(section: Int, triggerScrollToDateDelegate: Bool = false, animateScroll: Bool = true, completionHandler: (()->Void)?) {
         if scrollInProgress { return }
-        let position: UICollectionViewScrollPosition = self.direction == .horizontal ? .left : .top
+        let _: UICollectionViewScrollPosition = self.direction == .horizontal ? .left : .top
         if let validHandler = completionHandler {
             delayedExecutionClosure.append(validHandler)
         }
@@ -628,9 +628,8 @@ public class JTAppleCalendarView: UIView {
             // Set the new cache
             cachedConfiguration = validConfig 
             
-            if let
-                startMonth = Date.startOfMonthForDate(date: validConfig.startDate, usingCalendar: validConfig.calendar),
-                endMonth = Date.endOfMonthForDate(date: validConfig.endDate, usingCalendar: validConfig.calendar) {
+            if let startMonth = Date.startOfMonthForDate(date: validConfig.startDate, usingCalendar: validConfig.calendar),
+               let endMonth = Date.endOfMonthForDate(date: validConfig.endDate, usingCalendar: validConfig.calendar) {
                 
                 startOfMonthCache = startMonth as Date
                 endOfMonthCache = endMonth as Date

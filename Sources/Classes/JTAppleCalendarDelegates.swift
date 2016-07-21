@@ -83,9 +83,8 @@ extension JTAppleCalendarView: UIScrollViewDelegate {
         }
         
         if (directionVelocity == 0) {
-            guard let
-                    indexPath = calendarView.indexPathForItem(at: calcTestPoint(directionVelocity)),
-                    attributes = calendarView.layoutAttributesForItem(at: indexPath) else {
+            guard let indexPath = calendarView.indexPathForItem(at: calcTestPoint(directionVelocity)),
+                  let attributes = calendarView.layoutAttributesForItem(at: indexPath) else {
                         return //                            print("Landed on a header")
             }
             
@@ -118,7 +117,7 @@ extension JTAppleCalendarView: UIScrollViewDelegate {
     
     /// Tells the delegate when a scrolling animation in the scroll view concludes.
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        if let shouldTrigger = triggerScrollToDateDelegate where shouldTrigger == true {
+        if let shouldTrigger = triggerScrollToDateDelegate, shouldTrigger == true {
             scrollViewDidEndDecelerating(scrollView)
             triggerScrollToDateDelegate = nil
         }
@@ -149,7 +148,7 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
         if headerViewXibs.count == 1 {
             reuseIdentifier = headerViewXibs[0]
         } else {
-            guard let identifier = delegate?.calendar(self, sectionHeaderIdentifierForDate: date) where headerViewXibs.contains(identifier) else {
+            guard let identifier = delegate?.calendar(self, sectionHeaderIdentifierForDate: date), headerViewXibs.contains(identifier) else {
                 assert(false, "Identifier was not registered")
                 return UICollectionReusableView()
             }
@@ -196,11 +195,10 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
     /// Asks the delegate if the specified item should be selected. true if the item should be selected or false if it should not.
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
-        if let
-            delegate = self.delegate,
-            dateUserSelected = dateFromPath(indexPath),
-            cell = collectionView.cellForItem(at: indexPath) as? JTAppleDayCell
-        where
+        if  let delegate = self.delegate,
+            let dateUserSelected = dateFromPath(indexPath),
+            let cell = collectionView.cellForItem(at: indexPath) as? JTAppleDayCell,
+            
             cellWasNotDisabledOrHiddenByTheUser(cell) {
             let cellState = cellStateFromIndexPath(indexPath: indexPath, withDate: dateUserSelected)
             return delegate.calendar(self, canSelectDate: dateUserSelected, cell: cell.cellView, cellState: cellState)
@@ -213,9 +211,8 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
     }
     /// Tells the delegate that the item at the specified path was deselected. The collection view calls this method when the user successfully deselects an item in the collection view. It does not call this method when you programmatically deselect items.
     public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if let
-            delegate = self.delegate,
-            dateDeselectedByUser = dateFromPath(indexPath) {
+        if let delegate = self.delegate,
+            let dateDeselectedByUser = dateFromPath(indexPath) {
             
             // Update model
             deleteCellFromSelectedSetIfSelected(indexPath)
@@ -235,10 +232,9 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
     
     /// Asks the delegate if the specified item should be deselected. true if the item should be deselected or false if it should not.
     public func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
-        if let
-            delegate = self.delegate,
-            dateDeSelectedByUser = dateFromPath(indexPath),
-            cell = collectionView.cellForItem(at: indexPath) as? JTAppleDayCell where cellWasNotDisabledOrHiddenByTheUser(cell) {
+        if let delegate = self.delegate,
+            let dateDeSelectedByUser = dateFromPath(indexPath),
+            let cell = collectionView.cellForItem(at: indexPath) as? JTAppleDayCell, cellWasNotDisabledOrHiddenByTheUser(cell) {
             let cellState = cellStateFromIndexPath(indexPath: indexPath, withDate: dateDeSelectedByUser)
             return delegate.calendar(self, canDeselectDate: dateDeSelectedByUser, cell: cell.cellView, cellState:  cellState)
         }
@@ -246,9 +242,8 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
     }
     /// Tells the delegate that the item at the specified index path was selected. The collection view calls this method when the user successfully selects an item in the collection view. It does not call this method when you programmatically set the selection.
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let
-            delegate = self.delegate,
-            dateSelectedByUser = dateFromPath(indexPath) {
+        if let delegate = self.delegate,
+            let dateSelectedByUser = dateFromPath(indexPath) {
 
             // Update model
             addCellToSelectedSetIfUnselected(indexPath, date:dateSelectedByUser)

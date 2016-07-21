@@ -92,9 +92,9 @@ extension JTAppleCalendarView {
 
         for headerViewXibName in headerViewXibNames {
             let viewObject = Bundle.main.loadNibNamed(headerViewXibName, owner: self, options: [:])
-            assert(viewObject.count > 0, "your nib file name \(headerViewXibName) could not be loaded)")
+            assert(viewObject?.count > 0, "your nib file name \(headerViewXibName) could not be loaded)")
             
-            guard viewObject[0] is JTAppleHeaderView else {
+            guard viewObject?[0] is JTAppleHeaderView else {
                 assert(false, "xib file class does not conform to the protocol<JTAppleHeaderViewProtocol>")
                 return
             }
@@ -299,7 +299,7 @@ extension JTAppleCalendarView {
                     
                     
                     if animateScroll {
-                        if let check = self.calendarOffsetIsAlreadyAtScrollPosition(forIndexPath: iPath) where check == true {
+                        if let check = self.calendarOffsetIsAlreadyAtScrollPosition(forIndexPath: iPath), check == true {
                                 self.scrollViewDidEndScrollingAnimation(self.calendarView)
                                 self.scrollInProgress = false
                                 return

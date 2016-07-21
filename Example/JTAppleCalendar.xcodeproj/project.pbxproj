@@ -228,12 +228,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "JTAppleCalendar_Example" */;
 			buildPhases = (
-				9ADD2CCEC6B05B0DDA547275 /* Check Pods Manifest.lock */,
+				9ADD2CCEC6B05B0DDA547275 /* [CP] Check Pods Manifest.lock */,
 				607FACCC1AFB9204008FA782 /* Sources */,
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
-				E399F0D45F3A62018C51BCC3 /* Embed Pods Frameworks */,
-				460597413C88070D4A00BCE4 /* Copy Pods Resources */,
+				E399F0D45F3A62018C51BCC3 /* [CP] Embed Pods Frameworks */,
+				460597413C88070D4A00BCE4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -248,12 +248,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "JTAppleCalendar_Tests" */;
 			buildPhases = (
-				92B63BAB8F5C53D1DE425BEF /* Check Pods Manifest.lock */,
+				92B63BAB8F5C53D1DE425BEF /* [CP] Check Pods Manifest.lock */,
 				607FACE11AFB9204008FA782 /* Sources */,
 				607FACE21AFB9204008FA782 /* Frameworks */,
 				607FACE31AFB9204008FA782 /* Resources */,
-				2A366E0020CD9120B68FF550 /* Embed Pods Frameworks */,
-				A88551CF22BA3FD028E86EDB /* Copy Pods Resources */,
+				2A366E0020CD9120B68FF550 /* [CP] Embed Pods Frameworks */,
+				A88551CF22BA3FD028E86EDB /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -331,14 +331,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2A366E0020CD9120B68FF550 /* Embed Pods Frameworks */ = {
+		2A366E0020CD9120B68FF550 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -346,14 +346,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-JTAppleCalendar_Tests/Pods-JTAppleCalendar_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		460597413C88070D4A00BCE4 /* Copy Pods Resources */ = {
+		460597413C88070D4A00BCE4 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -361,14 +361,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-JTAppleCalendar_Example/Pods-JTAppleCalendar_Example-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		92B63BAB8F5C53D1DE425BEF /* Check Pods Manifest.lock */ = {
+		92B63BAB8F5C53D1DE425BEF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -376,14 +376,14 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		9ADD2CCEC6B05B0DDA547275 /* Check Pods Manifest.lock */ = {
+		9ADD2CCEC6B05B0DDA547275 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -391,14 +391,14 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		A88551CF22BA3FD028E86EDB /* Copy Pods Resources */ = {
+		A88551CF22BA3FD028E86EDB /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -406,14 +406,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-JTAppleCalendar_Tests/Pods-JTAppleCalendar_Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E399F0D45F3A62018C51BCC3 /* Embed Pods Frameworks */ = {
+		E399F0D45F3A62018C51BCC3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;

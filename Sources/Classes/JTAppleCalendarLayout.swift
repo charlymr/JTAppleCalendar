@@ -87,7 +87,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         var beganIntercepting = false
         var missCount = 0
         for sectionIndex in startSectionIndex..<cellCache.count {
-            if let validSection = cellCache[sectionIndex] where validSection.count > 0 {
+            if let validSection = cellCache[sectionIndex], validSection.count > 0 {
                 // Add header view attributes
                 if headerViewXibs.count > 0 {
                     if headerCache[sectionIndex].frame.intersects(rect) { attributes.append(headerCache[sectionIndex]) }
@@ -114,7 +114,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         let attr = UICollectionViewLayoutAttributes(forCellWith: indexPath)
         
         // If this index is already cached, then return it else, apply a new layout attribut to it
-        if let alreadyCachedCellAttrib = cellCache[indexPath.section] where indexPath.item < alreadyCachedCellAttrib.count {
+        if let alreadyCachedCellAttrib = cellCache[indexPath.section], indexPath.item < alreadyCachedCellAttrib.count {
             return alreadyCachedCellAttrib[indexPath.item]
         }
         applyLayoutAttributes(attributes: attr)
@@ -205,7 +205,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     func cachedHeaderSizeForSection(section: Int) -> CGSize {
         // We cache the header here so we dont call the delegate so much
         var headerSize = CGSize()
-        if let cachedHeader  = currentHeader where cachedHeader.section == section {
+        if let cachedHeader  = currentHeader, cachedHeader.section == section {
             headerSize = cachedHeader.size
         } else {
             headerSize = delegate!.referenceSizeForHeaderInSection(section)
@@ -216,7 +216,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
     
     func sizeForitemAtIndexPath(indexPath: NSIndexPath) -> CGSize {
         // Return the size if the cell size is already cached
-        if let cachedCell  = currentCell where cachedCell.section == indexPath.section { return cachedCell.itemSize }
+        if let cachedCell  = currentCell, cachedCell.section == indexPath.section { return cachedCell.itemSize }
         
         // Get header size if it alrady cached
         var headerSize =  CGSize()
