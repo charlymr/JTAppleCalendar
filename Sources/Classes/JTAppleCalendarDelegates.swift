@@ -191,7 +191,7 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as! JTAppleDayCell
         
         cell.setupView(cellSource: cellViewSource)
-        cell.updateCellView(cellInset.x, cellInsetY: cellInset.y)
+        cell.updateCellView(cellInsetX: cellInset.x, cellInsetY: cellInset.y)
         cell.bounds.origin = CGPoint(x: 0, y: 0)
         
         let date = dateFromPath(indexPath)!
@@ -219,13 +219,13 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
             
             cellWasNotDisabledOrHiddenByTheUser(cell) {
             let cellState = cellStateFromIndexPath(indexPath: indexPath, withDate: dateUserSelected)
-            return delegate.calendar(self, canSelectDate: dateUserSelected, cell: cell, cellState: cellState)
+            return delegate.calendar(self, canSelectDate: dateUserSelected, cell: cell.view!, cellState: cellState)
         }
         return false
     }
     
     func cellWasNotDisabledOrHiddenByTheUser(_ cell: JTAppleDayCell) -> Bool {
-        return cell.cellView.isHidden == false && cell.cellView.isUserInteractionEnabled == true
+        return cell.view!.isHidden == false && cell.view!.isUserInteractionEnabled == true
     }
     /// Tells the delegate that the item at the specified path was deselected. The collection view calls this method when the user successfully deselects an item in the collection view. It does not call this method when you programmatically deselect items.
     public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
@@ -254,7 +254,7 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
             let dateDeSelectedByUser = dateFromPath(indexPath),
             let cell = collectionView.cellForItem(at: indexPath) as? JTAppleDayCell, cellWasNotDisabledOrHiddenByTheUser(cell) {
             let cellState = cellStateFromIndexPath(indexPath: indexPath, withDate: dateDeSelectedByUser)
-            return delegate.calendar(self, canDeselectDate: dateDeSelectedByUser, cell: cell.cellView, cellState:  cellState)
+            return delegate.calendar(self, canDeselectDate: dateDeSelectedByUser, cell: cell.view!, cellState:  cellState)
         }
         return false
     }
@@ -272,7 +272,7 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
             if let aSelectedCounterPartIndexPath = selectCounterPartCellIndexPathIfExists(indexPath, date: dateSelectedByUser, dateOwner: cellState.dateBelongsTo) {
                 // ONLY if the counterPart cell is visible, then we need to inform the delegate
                 delayRunOnMainThread(delay: 0.0, closure: {
-                    self.reloadIndexPathsIfVisible([aSelectedCounterPartIndexPath])
+                    self.batchReloadIndexPaths([aSelectedCounterPartIndexPath])
                 })
             }
             delegate.calendar(self, didSelectDate: dateSelectedByUser, cell: selectedCell?.view, cellState: cellState)

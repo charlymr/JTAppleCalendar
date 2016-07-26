@@ -68,7 +68,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
             sectionSize.append(scrollDirection == .horizontal ? contentWidth : contentHeight)
             
         }
-        if headerViewXibs.count < 1 { headerCache.removeAll() } // Get rid of header data if dev didnt register headers. The were used for calculation but are not needed to be displayed
+        if delegate.registeredHeaderViews.count < 1 { headerCache.removeAll() } // Get rid of header data if dev didnt register headers. The were used for calculation but are not needed to be displayed
         if scrollDirection == .horizontal { contentHeight = self.collectionView!.bounds.size.height } else { contentWidth = self.collectionView!.bounds.size.width }
     }
     
@@ -89,7 +89,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         for sectionIndex in startSectionIndex..<cellCache.count {
             if let validSection = cellCache[sectionIndex], validSection.count > 0 {
                 // Add header view attributes
-                if headerViewXibs.count > 0 {
+                if delegate.registeredHeaderViews.count > 0 {
                     if headerCache[sectionIndex].frame.intersects(rect) { attributes.append(headerCache[sectionIndex]) }
                 }
                 
@@ -220,7 +220,7 @@ public class JTAppleCalendarLayout: UICollectionViewLayout, JTAppleCalendarLayou
         
         // Get header size if it alrady cached
         var headerSize =  CGSize()
-        if headerViewXibs.count > 0 { headerSize = cachedHeaderSizeForSection(section: indexPath.section) }
+        if delegate.registeredHeaderViews.count > 0 { headerSize = cachedHeaderSizeForSection(section: indexPath.section) }
         let currentItemSize = itemSize
         let size            = CGSize(width: currentItemSize.width, height: (collectionView!.frame.height - headerSize.height) / CGFloat(numberOfRows))
         currentCell         = (section: indexPath.section, itemSize: size)

@@ -9,13 +9,12 @@
 /// The JTAppleDayCell class defines the attributes and behavior of the cells that appear in JTAppleCalendarView objects.
 public class JTAppleDayCell: UICollectionViewCell, JTAppleReusableViewProtocolTrait {
 	var view: JTAppleDayCellView?
-    func updateCellView(_ view: JTAppleDayCellView) {
-        let vFrame = self.frame.insetBy(dx: internalCellInset.x, dy: internalCellInset.y)
-        view.frame = vFrame
-        view.center = CGPoint(x: self.bounds.size.width * 0.5, y: self.bounds.size.height * 0.5)
-        cellView = view
+    func updateCellView(cellInsetX: CGFloat, cellInsetY: CGFloat) {
+        let vFrame = self.frame.insetBy(dx: cellInsetX, dy: cellInsetY)
+        view!.frame = vFrame
+        view!.center = CGPoint(x: self.bounds.size.width * 0.5, y: self.bounds.size.height * 0.5)
     }
-	override init(frame: CGRect) {
+    override init(frame: CGRect) {
 		super.init(frame: frame)
 	}
 

@@ -140,8 +140,8 @@ extension JTAppleCalendarView {
         if !calendarView.allowsMultipleSelection && dates.count > 0 { validDatesToSelect = [dates.last!] }
         
         for date in validDatesToSelect {
-            let components = self.calendar.components([.Year, .Month, .Day],  fromDate: date as Date)
-            let firstDayOfDate = self.calendar.dateFromComponents(components)!
+            let components = self.calendar.components([.year, .month, .day],  from: date as Date)
+            let firstDayOfDate = self.calendar.date(from: components)!
             
             // If the date is not within valid boundaries, then exit
             if !(firstDayOfDate >= self.startOfMonthCache && firstDayOfDate <= self.endOfMonthCache) { continue }
@@ -170,18 +170,18 @@ extension JTAppleCalendarView {
             
             let deSelectTheDate = { (oldIndexPath: NSIndexPath) -> Void in
                 if !allIndexPathsToReload.contains(oldIndexPath) { allIndexPathsToReload.append(oldIndexPath) } // To avoid adding the  same indexPath twice.
-                if let index = self.theSelectedIndexPaths.indexOf(oldIndexPath as IndexPath) {
+                if let index = self.theSelectedIndexPaths.index(of: oldIndexPath as IndexPath) {
                     let oldDate = self.theSelectedDates[index]
-                    self.calendarView.deselectItemAtIndexPath(oldIndexPath as IndexPath, animated: false)
-                    self.theSelectedIndexPaths.removeAtIndex(index)
-                    self.theSelectedDates.removeAtIndex(index)
+                    self.calendarView.deselectItem(at: oldIndexPath as IndexPath, animated: false)
+                    self.theSelectedIndexPaths.remove(at: index)
+                    self.theSelectedDates.remove(at: index)
                     
                     // If delegate triggering is enabled, let the delegate function handle the cell
                     if triggerSelectionDelegate {
-                        self.collectionView(self.calendarView, didDeselectItemAtIndexPath: oldIndexPath)
+                        self.collectionView(self.calendarView, didDeselectItemAt: oldIndexPath as IndexPath)
                     } else { // Although we do not want the delegate triggered, we still want counterpart cells to be deselected
-                        let cellState = self.cellStateFromIndexPath(oldIndexPath, withDate: oldDate)
-                        if let anUnselectedCounterPartIndexPath = self.deselectCounterPartCellIndexPath(oldIndexPath, date: oldDate, dateOwner: cellState.dateBelongsTo) {
+                        let cellState = self.cellStateFromIndexPath(indexPath: oldIndexPath, withDate: oldDate)
+                        if let anUnselectedCounterPartIndexPath = self.deselectCounterPartCellIndexPath(oldIndexPath as IndexPath, date: oldDate, dateOwner: cellState.dateBelongsTo) {
                             // If there was a counterpart cell then it will also need to be reloaded
                              allIndexPathsToReload.append(anUnselectedCounterPartIndexPath)
                         }
@@ -215,7 +215,7 @@ extension JTAppleCalendarView {
         // If triggering was false, although the selectDelegates weren't called, we do want the cell refreshed. Reload to call itemAtIndexPath
         if triggerSelectionDelegate == false && allIndexPathsToReload.count > 0 {
             delayRunOnMainThread(delay: 0.0) {
-                self.batchReloadIndexPaths(allIndexPathsToReload)
+                self.batchReloadIndexPaths(allIndexPathsToReload as! [IndexPath])
             }
         }
     }
@@ -349,7 +349,7 @@ extension JTAppleCalendarView {
         var currentDate = startDate
         repeat {
             returnDates.append(currentDate)
-            currentDate = calendar.dateByAddingUnit(.Day, value: 1, toDate: currentDate, options: Calendar.Options.MatchNextTime)!
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate as Date, options: Calendar.Options.matchNextTime)!
         } while currentDate <= endDate
         return returnDates
     }

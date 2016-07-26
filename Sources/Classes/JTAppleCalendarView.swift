@@ -168,7 +168,7 @@ public class JTAppleCalendarView: UIView {
     public var selectedDates: [Date] {
         get {
             // Array may contain duplicate dates in case where out-dates are selected. So clean it up here
-            return Array(Set(theSelectedDates)).sort()
+            return Array(Set(theSelectedDates))
         }
     }
     
