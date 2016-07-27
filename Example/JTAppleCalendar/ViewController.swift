@@ -116,28 +116,28 @@ extension ViewController: JTAppleCalendarViewDataSource, JTAppleCalendarViewDele
         return (startDate: firstDate!, endDate: secondDate, numberOfRows: numberOfRows, calendar: aCalendar)
     }
 
-    func calendar(_ calendar: JTAppleCalendarView, isAboutToDisplayCell cell: JTAppleDayCellView, date: Date, cellState: CellState) {
+    func calendar(_ calendar : JTAppleCalendarView, isAboutToDisplayCell cell: JTAppleDayCellView, date:Date, cellState: CellState) -> Void {
         (cell as? CellView)?.setupCellBeforeDisplay(cellState, date: date as Date)
     }
 
-    func calendar(_ calendar: JTAppleCalendarView, didDeselectDate date: Date, cell: JTAppleDayCellView?, cellState: CellState) {
+    func calendar(_ calendar : JTAppleCalendarView, didDeselectDate date : Date, cell: JTAppleDayCellView?, cellState: CellState) -> Void {
         (cell as? CellView)?.cellSelectionChanged(cellState)
     }
     
-    func calendar(calendar: JTAppleCalendarView, didSelectDate date: NSDate, cell: JTAppleDayCellView?, cellState: CellState) {
+    func calendar(_ calendar : JTAppleCalendarView, didSelectDate date : Date, cell: JTAppleDayCellView?, cellState: CellState) -> Void {
         (cell as? CellView)?.cellSelectionChanged(cellState)
         printSelectedDates()
     }
     
-    func calendar(_ calendar: JTAppleCalendarView, isAboutToResetCell cell: JTAppleDayCellView) {
+    func calendar(_ calendar : JTAppleCalendarView, isAboutToResetCell cell: JTAppleDayCellView) -> Void {
         (cell as? CellView)?.selectedView.isHidden = true
     }
     
-    func calendar(calendar: JTAppleCalendarView, didScrollToDateSegmentStartingWithdate startDate: NSDate, endingWithDate endDate: NSDate) {
+    func calendar(_ calendar : JTAppleCalendarView, didScrollToDateSegmentStartingWithdate startDate: Date, endingWithDate endDate: Date) -> Void {
         setupViewsOfCalendar(startDate as Date, endDate: endDate as Date)
     }
     
-    func calendar(calendar: JTAppleCalendarView, sectionHeaderIdentifierForDate date: (startDate: NSDate, endDate: NSDate)) -> String? {
+    func calendar(_ calendar : JTAppleCalendarView, sectionHeaderIdentifierForDate date: (startDate: Date, endDate: Date)) -> String? {
         let comp = testCalendar.component(.month, from: date.startDate as Date)
         if comp % 2 > 0{
             return "WhiteSectionHeaderView"
@@ -145,7 +145,7 @@ extension ViewController: JTAppleCalendarViewDataSource, JTAppleCalendarViewDele
         return "PinkSectionHeaderView"
     }
    
-    func calendar(calendar: JTAppleCalendarView, sectionHeaderSizeForDate date: (startDate: NSDate, endDate: NSDate)) -> CGSize {
+    func calendar(_ calendar : JTAppleCalendarView, sectionHeaderSizeForDate date: (startDate: Date, endDate: Date)) -> CGSize {
         if testCalendar.component(.month, from: date.startDate as Date) % 2 == 1 {
             return CGSize(width: 200, height: 50)
         } else {
@@ -153,7 +153,7 @@ extension ViewController: JTAppleCalendarViewDataSource, JTAppleCalendarViewDele
         }
     }
     
-    func calendar(calendar: JTAppleCalendarView, isAboutToDisplaySectionHeader header: JTAppleHeaderView, date: (startDate: NSDate, endDate: NSDate), identifier: String) {
+    func calendar(_ calendar : JTAppleCalendarView, isAboutToDisplaySectionHeader header: JTAppleHeaderView, date: (startDate: Date, endDate: Date), identifier: String) -> Void {
         switch identifier {
         case "WhiteSectionHeaderView":
             let headerCell = (header as? WhiteSectionHeaderView)
