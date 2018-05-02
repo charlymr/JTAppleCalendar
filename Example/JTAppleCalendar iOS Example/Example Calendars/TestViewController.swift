@@ -98,6 +98,32 @@ class TestViewController: UIViewController {
         calendarView.allowsMultipleSelection = true
         calendarView.isRangeSelectionUsed = true
     }
+    
+    
+    var numberOfRows: Int = 6
+
+    @IBAction func changeRowsNumber(_ sender: UIButton) {
+        numberOfRows = 1
+        let frame = calendarView.frame
+        calendarView.frame = CGRect(x: frame.origin.x,
+                                    y: frame.origin.y,
+                                    width: frame.width,
+                                    height: 200 / 6)
+        calendarView.reloadData()
+
+    }
+
+    @IBAction func changeRowsNumberOpen(_ sender: UIButton) {
+        numberOfRows = 6
+        let frame = calendarView.frame
+        calendarView.frame = CGRect(x: frame.origin.x,
+                                    y: frame.origin.y,
+                                    width: frame.width,
+                                    height: 200)
+        calendarView.reloadData()
+        
+    }
+    
     func setupViewsOfCalendar(from visibleDates: DateSegmentInfo) {
         guard let startDate = visibleDates.monthDates.first?.date else {
             return
@@ -141,6 +167,7 @@ class TestViewController: UIViewController {
     }
     
     var iii: Date?
+    
 }
 
 
@@ -171,7 +198,8 @@ extension TestViewController: JTAppleCalendarViewDataSource, JTAppleCalendarView
         let startDate = formatter.date(from: "2017 01 01")!
         let endDate = formatter.date(from: "2030 02 01")!
         
-        let parameters = ConfigurationParameters(startDate: startDate,endDate: endDate)
+        let parameters = ConfigurationParameters(startDate: startDate,endDate: endDate, numberOfRows: numberOfRows)
+        
         return parameters
     }
     
